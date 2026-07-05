@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 const FAQPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-cream">
-      <header className="bg-dark-chocolate text-white py-4">
+      <header className="bg-charcoal text-white py-4">
         <div className="container-custom flex justify-between items-center">
-          <Link to="/" className="text-gold text-2xl font-bold">🎂 Malika's</Link>
-          <h1 className="text-xl">FAQ</h1>
+          <Link to="/" className="brand-logo text-2xl">🧁 Malika's</Link>
+          <h1 className="text-xl font-semibold text-white">FAQ</h1>
           <div></div>
         </div>
       </header>

@@ -117,9 +117,9 @@ const OrderFormWizard: React.FC = () => {
               className="flex flex-col items-center gap-1 flex-1 min-w-[60px]"
             >
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
+                className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-all ${
                   isActive
-                    ? 'bg-gold text-dark-chocolate'
+                    ? 'bg-pink text-white scale-110'
                     : isDone
                       ? 'bg-green-500 text-white'
                       : 'bg-gray-200 text-gray-500'
@@ -127,7 +127,7 @@ const OrderFormWizard: React.FC = () => {
               >
                 {isDone ? '✓' : step}
               </div>
-              <span className={`text-xs ${isActive ? 'font-bold text-dark-chocolate' : 'text-gray-400'}`}>
+              <span className={`text-xs ${isActive ? 'font-bold text-charcoal' : 'text-gray-400'}`}>
                 {label}
               </span>
             </button>

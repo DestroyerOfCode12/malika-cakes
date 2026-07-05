@@ -33,18 +33,18 @@ const Step4_ToppersSelection: React.FC = () => {
               key={topper.id}
               type="button"
               onClick={() => toggleTopper(topper.id, price)}
-              className={`text-center p-4 rounded-lg border-2 transition-all relative ${
+              className={`text-center p-4 rounded-xl border-2 transition-all hover:scale-[1.02] relative ${
                 isSelected
-                  ? 'border-gold bg-pink shadow-md'
-                  : 'border-gray-200 hover:border-gold/50 bg-white'
+                  ? 'border-pink bg-pink-light shadow-md scale-[1.02]'
+                  : 'border-gray-200 hover:border-pink/50 bg-white'
               }`}
             >
               {isSelected && (
-                <span className="absolute top-2 right-2 text-gold text-lg">✓</span>
+                <span className="absolute top-2 right-2 text-pink text-lg">✓</span>
               )}
-              <div className="text-2xl mb-2">✨</div>
+              <div className="text-2xl mb-2 hover-wiggle">✨</div>
               <h4 className="font-medium text-sm">{topper.name}</h4>
-              <p className="text-gold font-bold text-sm mt-1">
+              <p className="text-pink font-bold text-sm mt-1">
                 {price > 0 ? `+${formatPrice(price)}` : 'Free'}
               </p>
             </button>

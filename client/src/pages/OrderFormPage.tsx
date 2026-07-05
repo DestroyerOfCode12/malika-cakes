@@ -16,10 +16,10 @@ const OrderFormPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-dark-chocolate text-white py-4">
+      <header className="bg-charcoal text-white py-4">
         <div className="container-custom flex justify-between items-center">
-          <Link to="/" className="text-gold text-2xl font-bold">🎂 Malika's</Link>
-          <h1 className="text-xl">Custom Cake Order</h1>
+          <Link to="/" className="brand-logo text-2xl">🧁 Malika's</Link>
+          <h1 className="text-xl font-semibold text-white">Custom Cake Order</h1>
           <div></div>
         </div>
       </header>
@@ -41,7 +41,7 @@ const OrderFormPage: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-dark-chocolate text-white py-4 mt-12">
+      <footer className="bg-charcoal text-white py-4 mt-12">
         <div className="container-custom text-center text-sm">
           <p>&copy; 2026 Malika's Cake Boutique</p>
         </div>

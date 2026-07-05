@@ -27,10 +27,10 @@ const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-chocolate to-gold flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-charcoal to-pink flex items-center justify-center">
       <div className="card max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gold mb-2">🎂 Admin</h1>
+          <h1 className="brand-logo text-4xl mb-2">🧁 Admin</h1>
           <p className="text-gray-600">Malika's Cake Boutique Dashboard</p>
         </div>
 
@@ -75,7 +75,7 @@ const AdminLoginPage: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/" className="text-gold hover:text-gold/80">
+          <Link to="/" className="text-pink hover:text-pink/80">
             Back to Home
           </Link>
         </div>

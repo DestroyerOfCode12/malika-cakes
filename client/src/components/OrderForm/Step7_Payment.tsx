@@ -53,9 +53,9 @@ const Step7_Payment: React.FC = () => {
       <h3 className="text-xl font-bold mb-2">Payment</h3>
       <p className="text-gray-600 mb-6">Secure your order by arranging payment.</p>
 
-      <div className="p-6 bg-pink rounded-lg text-center mb-6">
+      <div className="p-6 bg-pink-light rounded-2xl text-center mb-6">
         <p className="text-sm text-gray-600 mb-1">Total Amount Due</p>
-        <p className="text-4xl font-bold text-gold">{formatPrice(pricing.total)}</p>
+        <p className="text-4xl font-bold text-pink">{formatPrice(pricing.total)}</p>
         {paymentDueDate && (
           <p className="text-sm text-gray-600 mt-2">
             Payment due by <strong>{formatDate(paymentDueDate)}</strong>

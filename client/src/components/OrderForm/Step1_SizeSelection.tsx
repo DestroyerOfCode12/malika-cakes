@@ -24,17 +24,17 @@ const Step1_SizeSelection: React.FC = () => {
               key={size.id}
               type="button"
               onClick={() => setSize(size.id, Number(size.basePrice))}
-              className={`text-left p-4 rounded-lg border-2 transition-all ${
+              className={`text-left p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${
                 isSelected
-                  ? 'border-gold bg-pink shadow-md'
-                  : 'border-gray-200 hover:border-gold/50 bg-white'
+                  ? 'border-pink bg-pink-light shadow-md scale-[1.02]'
+                  : 'border-gray-200 hover:border-pink/50 bg-white'
               }`}
             >
               <div className="flex justify-between items-start mb-2">
                 <h4 className="font-bold text-lg">{size.name}</h4>
-                {isSelected && <span className="text-gold text-xl">✓</span>}
+                {isSelected && <span className="text-pink text-xl">✓</span>}
               </div>
-              <p className="text-gold font-bold text-xl mb-1">{formatPrice(Number(size.basePrice))}</p>
+              <p className="text-pink font-bold text-xl mb-1">{formatPrice(Number(size.basePrice))}</p>
               {(size.servingsMin || size.servingsMax) && (
                 <p className="text-sm text-gray-500 mb-1">
                   Serves {size.servingsMin}
