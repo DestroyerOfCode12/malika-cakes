@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(mkdir -p server client && ls -la)",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
+    ]
+  }
+}
