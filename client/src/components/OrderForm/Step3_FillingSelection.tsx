@@ -25,17 +25,17 @@ const Step3_FillingSelection: React.FC = () => {
               key={filling.id}
               type="button"
               onClick={() => setFilling(filling.id, price)}
-              className={`w-full flex justify-between items-center p-4 rounded-lg border-2 transition-all ${
+              className={`w-full flex justify-between items-center p-4 rounded-xl border-2 transition-all hover:scale-[1.01] ${
                 isSelected
-                  ? 'border-gold bg-pink shadow-md'
-                  : 'border-gray-200 hover:border-gold/50 bg-white'
+                  ? 'border-pink bg-pink-light shadow-md'
+                  : 'border-gray-200 hover:border-pink/50 bg-white'
               }`}
             >
               <div className="flex items-center gap-3">
-                {isSelected && <span className="text-gold text-xl">✓</span>}
+                {isSelected && <span className="text-pink text-xl">✓</span>}
                 <span className="font-medium">{filling.name}</span>
               </div>
-              <span className="text-gold font-bold">+{formatPrice(price)}</span>
+              <span className="text-pink font-bold">+{formatPrice(price)}</span>
             </button>
           );
         })}

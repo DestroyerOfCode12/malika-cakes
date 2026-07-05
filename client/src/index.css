@@ -2,15 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom variables */
+/* Custom variables — palette lifted from the Malika's logo (pink + charcoal + white) */
 :root {
-  --color-gold: #D4AF37;
-  --color-pink: #F8D7DA;
-  --color-dark-chocolate: #3B2F2F;
-  --color-cream: #FFF9F5;
+  --color-pink: #DB2777;
+  --color-pink-light: #FDF2F8;
+  --color-charcoal: #3F3F46;
+  --color-cream: #FFF8FA;
 
-  --font-serif: Georgia, serif;
-  --font-sans: Inter, Poppins, sans-serif;
+  --font-script: 'Pacifico', cursive;
+  --font-sans: 'Poppins', Inter, sans-serif;
 }
 
 /* Global styles */
@@ -24,13 +24,21 @@ html {
 
 body {
   font-family: var(--font-sans);
-  color: #333;
-  background-color: #fafafa;
+  color: var(--color-charcoal);
+  background-color: var(--color-cream);
 }
 
 h1, h2, h3 {
-  font-family: var(--font-serif);
-  color: var(--color-dark-chocolate);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--color-charcoal);
+}
+
+/* Brand wordmark — mirrors the hand-brushed script in the logo */
+.brand-logo {
+  font-family: var(--font-script);
+  color: var(--color-pink);
+  line-height: 1;
 }
 
 /* Utility classes */
@@ -39,19 +47,19 @@ h1, h2, h3 {
 }
 
 .btn-primary {
-  @apply bg-gold text-dark-chocolate hover:bg-opacity-90 transition-all px-6 py-3 rounded-lg font-medium;
+  @apply bg-pink text-white hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold shadow-md shadow-pink/20;
 }
 
 .btn-secondary {
-  @apply bg-pink text-dark-chocolate hover:bg-opacity-90 transition-all px-6 py-3 rounded-lg font-medium;
+  @apply bg-pink-light text-pink hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold;
 }
 
 .btn-outline {
-  @apply border-2 border-gold text-gold hover:bg-gold hover:text-dark-chocolate transition-all px-6 py-3 rounded-lg font-medium;
+  @apply border-2 border-pink text-pink hover:bg-pink hover:text-white hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold;
 }
 
 .input-base {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold;
+  @apply w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink;
 }
 
 .badge-status {
@@ -59,7 +67,7 @@ h1, h2, h3 {
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-md p-6;
+  @apply bg-white rounded-2xl shadow-lg shadow-pink-light p-6;
 }
 
 .divider {
@@ -78,6 +86,16 @@ h1, h2, h3 {
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Playful hover wiggle for fun decorative icons/emoji */
+.hover-wiggle:hover {
+  animation: wiggle 0.4s ease-in-out;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
 }
 
 /* Responsive adjustments */

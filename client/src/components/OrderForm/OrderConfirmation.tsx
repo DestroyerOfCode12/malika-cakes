@@ -10,8 +10,8 @@ const OrderConfirmation: React.FC = () => {
 
   return (
     <div className="text-center py-6 animate-fade-in">
-      <div className="text-6xl mb-4">✨</div>
-      <h2 className="text-2xl font-bold text-dark-chocolate mb-2">Order Confirmed!</h2>
+      <div className="text-6xl mb-4 animate-pop">🎉🧁</div>
+      <h2 className="text-2xl font-bold text-charcoal mb-2">Order Confirmed!</h2>
       <p className="text-gray-600 mb-6">
         Thank you! We've received your order and sent a confirmation email.
       </p>
@@ -23,7 +23,7 @@ const OrderConfirmation: React.FC = () => {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-500">Total</span>
-          <span className="font-bold text-gold">{formatPrice(submittedOrder.totalPrice)}</span>
+          <span className="font-bold text-pink">{formatPrice(submittedOrder.totalPrice)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-500">Pickup Date</span>

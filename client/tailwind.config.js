@@ -7,14 +7,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        gold: '#D4AF37',
-        pink: '#F8D7DA',
-        'dark-chocolate': '#3B2F2F',
-        cream: '#FFF9F5',
+        // Palette lifted directly from the Malika's Cake Boutique logo:
+        // rose pink + charcoal + white. No gold/brown.
+        pink: '#DB2777',
+        'pink-light': '#FDF2F8',
+        charcoal: '#3F3F46',
+        cream: '#FFF8FA',
       },
       fontFamily: {
-        serif: ['Georgia', 'serif'],
-        sans: ['Inter', 'Poppins', 'sans-serif'],
+        script: ['Pacifico', 'cursive'],
+        sans: ['Poppins', 'Inter', 'sans-serif'],
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+        pop: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.06)' },
+          '100%': { transform: 'scale(1)' },
+        },
+      },
+      animation: {
+        wiggle: 'wiggle 0.4s ease-in-out',
+        pop: 'pop 0.25s ease-in-out',
       },
     },
   },

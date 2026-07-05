@@ -12,7 +12,7 @@ const PriceSummary: React.FC = () => {
 
   return (
     <div className="card sticky top-4">
-      <h3 className="text-xl font-bold mb-4 text-gold">Your Order</h3>
+      <h3 className="brand-logo text-2xl mb-4">Your Order</h3>
 
       {(size || flavor) && (
         <div className="mb-4 pb-4 border-b text-sm space-y-1">
@@ -53,11 +53,11 @@ const PriceSummary: React.FC = () => {
 
       <div className="flex justify-between text-lg font-bold mb-2">
         <span>Total</span>
-        <span className="text-gold">{formatPrice(pricing.total)}</span>
+        <span className="text-pink">{formatPrice(pricing.total)}</span>
       </div>
 
       {formData.pickupDate && (
-        <div className="bg-pink p-3 rounded mt-4 text-sm">
+        <div className="bg-pink-light p-3 rounded-xl mt-4 text-sm">
           <p className="font-medium">Pickup: {formData.pickupDate} at {formData.pickupTime}</p>
           <p className="text-gray-600">Payment due 7 days prior</p>
         </div>

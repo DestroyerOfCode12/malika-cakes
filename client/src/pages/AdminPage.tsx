@@ -6,9 +6,9 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream">
-      <header className="bg-dark-chocolate text-white py-4">
+      <header className="bg-charcoal text-white py-4">
         <div className="container-custom flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gold">Admin Dashboard</h1>
+          <h1 className="brand-logo text-2xl">🧁 Admin Dashboard</h1>
           <div className="flex items-center space-x-4">
             <span className="text-sm">Welcome, {user?.email}</span>
             <button
@@ -27,19 +27,19 @@ const AdminPage: React.FC = () => {
       <main className="container-custom py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="card text-center">
-            <div className="text-3xl font-bold text-gold">0</div>
+            <div className="text-3xl font-bold text-pink">0</div>
             <p className="text-gray-600">Total Orders</p>
           </div>
           <div className="card text-center">
-            <div className="text-3xl font-bold text-gold">R0</div>
+            <div className="text-3xl font-bold text-pink">R0</div>
             <p className="text-gray-600">Total Revenue</p>
           </div>
           <div className="card text-center">
-            <div className="text-3xl font-bold text-gold">0</div>
+            <div className="text-3xl font-bold text-pink">0</div>
             <p className="text-gray-600">Upcoming Pickups</p>
           </div>
           <div className="card text-center">
-            <div className="text-3xl font-bold text-gold">0</div>
+            <div className="text-3xl font-bold text-pink">0</div>
             <p className="text-gray-600">Overdue Payments</p>
           </div>
         </div>

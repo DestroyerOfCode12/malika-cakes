@@ -21,7 +21,7 @@ const Step6_OrderSummary: React.FC = () => {
     <button
       type="button"
       onClick={() => setStep(step)}
-      className="text-sm text-gold hover:underline"
+      className="text-sm text-pink hover:underline"
     >
       Edit
     </button>
@@ -97,7 +97,7 @@ const Step6_OrderSummary: React.FC = () => {
 
         <hr className="divider" />
 
-        <div className="p-4 bg-pink rounded-lg space-y-2">
+        <div className="p-4 bg-pink-light rounded-xl space-y-2">
           <div className="flex justify-between text-sm">
             <span>Base Price</span>
             <span>{formatPrice(pricing.basePrice)}</span>
@@ -114,10 +114,10 @@ const Step6_OrderSummary: React.FC = () => {
             <span>VAT (15%)</span>
             <span>{formatPrice(pricing.tax)}</span>
           </div>
-          <hr className="border-gold/30" />
+          <hr className="border-pink/30" />
           <div className="flex justify-between font-bold text-lg">
             <span>Total</span>
-            <span className="text-gold">{formatPrice(pricing.total)}</span>
+            <span className="text-pink">{formatPrice(pricing.total)}</span>
           </div>
         </div>
 
