@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import { LoginRequest, LoginResponse, AuthUser, ApiResponse } from '../types';
+import { LoginRequest, LoginResponse, AuthUser } from '../types';
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {

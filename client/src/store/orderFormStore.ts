@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const VAT_RATE = 0.15;
+
 interface OrderFormState {
   currentStep: number;
   formData: {
@@ -24,13 +26,25 @@ interface OrderFormState {
     tax: number;
     total: number;
   };
+  submittedOrder: {
+    id: string;
+    orderNumber: string;
+    totalPrice: number;
+    pickupDate: string;
+    paymentDueDate: string;
+  } | null;
   error: string | null;
 
   setStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
   updateFormData: (data: Partial<OrderFormState['formData']>) => void;
-  updatePricing: (pricing: Partial<OrderFormState['pricing']>) => void;
+  setSize: (sizeId: string, basePrice: number) => void;
+  setFlavor: (flavorId: string) => void;
+  setFilling: (fillingId: string, price: number) => void;
   addTopper: (topperId: string, price: number) => void;
   removeTopper: (topperId: string, price: number) => void;
+  setSubmittedOrder: (order: OrderFormState['submittedOrder']) => void;
   setError: (error: string | null) => void;
   resetForm: () => void;
 }
@@ -58,16 +72,32 @@ const initialPricing: OrderFormState['pricing'] = {
   total: 0,
 };
 
+const recalculate = (basePrice: number, fillingPrice: number, toppersPrice: number) => {
+  const subtotal = Number((basePrice + fillingPrice + toppersPrice).toFixed(2));
+  const tax = Number((subtotal * VAT_RATE).toFixed(2));
+  const total = Number((subtotal + tax).toFixed(2));
+  return { basePrice, fillingPrice, toppersPrice, subtotal, tax, total };
+};
+
 export const useOrderFormStore = create<OrderFormState>()(
   persist(
     (set) => ({
       currentStep: 1,
       formData: initialFormData,
       pricing: initialPricing,
+      submittedOrder: null,
       error: null,
 
       setStep: (step: number) => {
-        set({ currentStep: step });
+        set({ currentStep: step, error: null });
+      },
+
+      nextStep: () => {
+        set((state) => ({ currentStep: Math.min(7, state.currentStep + 1), error: null }));
+      },
+
+      prevStep: () => {
+        set((state) => ({ currentStep: Math.max(1, state.currentStep - 1), error: null }));
       },
 
       updateFormData: (data: Partial<OrderFormState['formData']>) => {
@@ -76,52 +106,52 @@ export const useOrderFormStore = create<OrderFormState>()(
         }));
       },
 
-      updatePricing: (pricing: Partial<OrderFormState['pricing']>) => {
+      setSize: (sizeId: string, basePrice: number) => {
         set((state) => ({
-          pricing: { ...state.pricing, ...pricing },
+          formData: { ...state.formData, sizeId },
+          pricing: recalculate(basePrice, state.pricing.fillingPrice, state.pricing.toppersPrice),
+        }));
+      },
+
+      setFlavor: (flavorId: string) => {
+        set((state) => ({
+          formData: { ...state.formData, flavorId },
+        }));
+      },
+
+      setFilling: (fillingId: string, price: number) => {
+        set((state) => ({
+          formData: { ...state.formData, fillingId },
+          pricing: recalculate(state.pricing.basePrice, price, state.pricing.toppersPrice),
         }));
       },
 
       addTopper: (topperId: string, price: number) => {
         set((state) => {
           const newTopperIds = [...state.formData.topperIds, topperId];
-          const newToppersPrice = state.pricing.toppersPrice + price;
-          const subtotal = state.pricing.basePrice + state.pricing.fillingPrice + newToppersPrice;
-          const tax = Number((subtotal * 0.15).toFixed(2));
-          const total = Number((subtotal + tax).toFixed(2));
+          const newToppersPrice = Number((state.pricing.toppersPrice + price).toFixed(2));
 
           return {
             formData: { ...state.formData, topperIds: newTopperIds },
-            pricing: {
-              ...state.pricing,
-              toppersPrice: Number(newToppersPrice.toFixed(2)),
-              subtotal: Number(subtotal.toFixed(2)),
-              tax,
-              total,
-            },
+            pricing: recalculate(state.pricing.basePrice, state.pricing.fillingPrice, newToppersPrice),
           };
         });
       },
 
       removeTopper: (topperId: string, price: number) => {
         set((state) => {
-          const newTopperIds = state.formData.topperIds.filter(id => id !== topperId);
-          const newToppersPrice = state.pricing.toppersPrice - price;
-          const subtotal = state.pricing.basePrice + state.pricing.fillingPrice + newToppersPrice;
-          const tax = Number((subtotal * 0.15).toFixed(2));
-          const total = Number((subtotal + tax).toFixed(2));
+          const newTopperIds = state.formData.topperIds.filter((id) => id !== topperId);
+          const newToppersPrice = Number((state.pricing.toppersPrice - price).toFixed(2));
 
           return {
             formData: { ...state.formData, topperIds: newTopperIds },
-            pricing: {
-              ...state.pricing,
-              toppersPrice: Number(newToppersPrice.toFixed(2)),
-              subtotal: Number(subtotal.toFixed(2)),
-              tax,
-              total,
-            },
+            pricing: recalculate(state.pricing.basePrice, state.pricing.fillingPrice, newToppersPrice),
           };
         });
+      },
+
+      setSubmittedOrder: (order) => {
+        set({ submittedOrder: order });
       },
 
       setError: (error: string | null) => {
@@ -133,6 +163,7 @@ export const useOrderFormStore = create<OrderFormState>()(
           currentStep: 1,
           formData: initialFormData,
           pricing: initialPricing,
+          submittedOrder: null,
           error: null,
         });
       },
