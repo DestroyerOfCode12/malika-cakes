@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom variables */
+:root {
+  --color-gold: #D4AF37;
+  --color-pink: #F8D7DA;
+  --color-dark-chocolate: #3B2F2F;
+  --color-cream: #FFF9F5;
+
+  --font-serif: Georgia, serif;
+  --font-sans: Inter, Poppins, sans-serif;
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: #333;
+  background-color: #fafafa;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  color: var(--color-dark-chocolate);
+}
+
+/* Utility classes */
+.container-custom {
+  @apply max-w-4xl mx-auto px-4 py-8;
+}
+
+.btn-primary {
+  @apply bg-gold text-dark-chocolate hover:bg-opacity-90 transition-all px-6 py-3 rounded-lg font-medium;
+}
+
+.btn-secondary {
+  @apply bg-pink text-dark-chocolate hover:bg-opacity-90 transition-all px-6 py-3 rounded-lg font-medium;
+}
+
+.btn-outline {
+  @apply border-2 border-gold text-gold hover:bg-gold hover:text-dark-chocolate transition-all px-6 py-3 rounded-lg font-medium;
+}
+
+.input-base {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold;
+}
+
+.badge-status {
+  @apply inline-block px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-md p-6;
+}
+
+.divider {
+  @apply border-t border-gray-200 my-6;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .container-custom {
+    @apply px-3 py-4;
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+}
