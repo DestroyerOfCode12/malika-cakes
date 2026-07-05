@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import { CatalogSize, CatalogFlavor, CatalogFilling, CatalogTopper, ApiResponse } from '../types';
+import { CatalogSize, CatalogFlavor, CatalogFilling, CatalogTopper } from '../types';
 
 interface CatalogResponse<T> {
   data: T[];
