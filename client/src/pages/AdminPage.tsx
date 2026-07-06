@@ -5,6 +5,7 @@ import { AdminDashboardStats } from '../types';
 import { formatPrice } from '../utils/formatters';
 import OrderQueue from '../components/Admin/OrderQueue';
 import CustomerList from '../components/Admin/CustomerList';
+import Logo from '../components/Logo';
 
 type Tab = 'orders' | 'customers';
 
@@ -31,7 +32,10 @@ const AdminPage: React.FC = () => {
     <div className="min-h-screen bg-cream">
       <header className="bg-charcoal text-white py-4">
         <div className="container-custom flex justify-between items-center">
-          <h1 className="brand-logo text-2xl">🧁 Admin Dashboard</h1>
+          <span className="flex items-center gap-3">
+            <Logo onDark />
+            <span className="text-sm uppercase tracking-widest text-blush hidden md:inline">Admin</span>
+          </span>
           <div className="flex items-center space-x-4">
             <span className="text-sm hidden sm:inline">Welcome, {user?.email}</span>
             <button
@@ -50,8 +54,11 @@ const AdminPage: React.FC = () => {
       <main className="container-custom py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {statCards.map((card) => (
-            <div key={card.label} className="card text-center">
+          {statCards.map((card, idx) => (
+            <div
+              key={card.label}
+              className={`card text-center animate-rise ${['', 'delay-75', 'delay-150', 'delay-225'][idx]}`}
+            >
               <div className="text-2xl md:text-3xl font-bold text-pink">{card.value}</div>
               <p className="text-gray-600 text-sm">{card.label}</p>
             </div>

@@ -135,8 +135,10 @@ const OrderFormWizard: React.FC = () => {
         })}
       </div>
 
-      {/* Step content */}
-      <div className="min-h-[300px]">{renderStep()}</div>
+      {/* Step content — keyed on step so each transition re-runs the entrance */}
+      <div key={currentStep} className="min-h-[300px] animate-rise">
+        {renderStep()}
+      </div>
 
       {error && (
         <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-6">{error}</div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import Logo from '../components/Logo';
 
 const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,10 +29,10 @@ const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-charcoal to-pink flex items-center justify-center">
-      <div className="card max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="brand-logo text-4xl mb-2">🧁 Admin</h1>
-          <p className="text-gray-600">Malika's Cake Boutique Dashboard</p>
+      <div className="card max-w-md w-full animate-scale-in">
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Logo variant="stacked" className="scale-75 -my-4" />
+          <p className="text-gray-600 mt-2">Admin Dashboard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

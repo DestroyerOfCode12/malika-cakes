@@ -8,14 +8,15 @@ export default {
     extend: {
       colors: {
         // Palette lifted directly from the Malika's Cake Boutique logo:
-        // rose pink + charcoal + white. No gold/brown.
+        // rose pink + pastel blush + charcoal + white. No gold/brown.
         pink: '#DB2777',
         'pink-light': '#FDF2F8',
+        blush: '#F7C8D3',
         charcoal: '#3F3F46',
         cream: '#FFF8FA',
       },
       fontFamily: {
-        script: ['Pacifico', 'cursive'],
+        script: ['"Kaushan Script"', 'cursive'],
         sans: ['Poppins', 'Inter', 'sans-serif'],
       },
       keyframes: {
