@@ -1,8 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { adminService } from '../services/adminService';
+import { AdminDashboardStats } from '../types';
+import { formatPrice } from '../utils/formatters';
+import OrderQueue from '../components/Admin/OrderQueue';
+import CustomerList from '../components/Admin/CustomerList';
+
+type Tab = 'orders' | 'customers';
 
 const AdminPage: React.FC = () => {
   const { user, logout } = useAuthStore();
+  const [tab, setTab] = useState<Tab>('orders');
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
+
+  useEffect(() => {
+    adminService
+      .getDashboard()
+      .then((result) => setStats(result.data))
+      .catch(() => setStats(null));
+  }, []);
+
+  const statCards = [
+    { label: 'Total Orders', value: stats ? String(stats.totalOrders) : '—' },
+    { label: 'Total Revenue', value: stats ? formatPrice(stats.totalRevenue) : '—' },
+    { label: 'Pickups (next 7 days)', value: stats ? String(stats.upcomingPickups) : '—' },
+    { label: 'Overdue Payments', value: stats ? String(stats.overduePayments) : '—' },
+  ];
 
   return (
     <div className="min-h-screen bg-cream">
@@ -10,7 +33,7 @@ const AdminPage: React.FC = () => {
         <div className="container-custom flex justify-between items-center">
           <h1 className="brand-logo text-2xl">🧁 Admin Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-sm">Welcome, {user?.email}</span>
+            <span className="text-sm hidden sm:inline">Welcome, {user?.email}</span>
             <button
               onClick={() => {
                 logout();
@@ -25,34 +48,34 @@ const AdminPage: React.FC = () => {
       </header>
 
       <main className="container-custom py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="card text-center">
-            <div className="text-3xl font-bold text-pink">0</div>
-            <p className="text-gray-600">Total Orders</p>
-          </div>
-          <div className="card text-center">
-            <div className="text-3xl font-bold text-pink">R0</div>
-            <p className="text-gray-600">Total Revenue</p>
-          </div>
-          <div className="card text-center">
-            <div className="text-3xl font-bold text-pink">0</div>
-            <p className="text-gray-600">Upcoming Pickups</p>
-          </div>
-          <div className="card text-center">
-            <div className="text-3xl font-bold text-pink">0</div>
-            <p className="text-gray-600">Overdue Payments</p>
-          </div>
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {statCards.map((card) => (
+            <div key={card.label} className="card text-center">
+              <div className="text-2xl md:text-3xl font-bold text-pink">{card.value}</div>
+              <p className="text-gray-600 text-sm">{card.label}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="card">
-            <h3 className="text-xl font-bold mb-4">Order Queue</h3>
-            <p className="text-gray-600">Coming soon: Order management interface</p>
-          </div>
-          <div className="card">
-            <h3 className="text-xl font-bold mb-4">Customers</h3>
-            <p className="text-gray-600">Coming soon: Customer management</p>
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            className={tab === 'orders' ? 'btn-primary py-2' : 'btn-secondary py-2'}
+            onClick={() => setTab('orders')}
+          >
+            Order Queue
+          </button>
+          <button
+            className={tab === 'customers' ? 'btn-primary py-2' : 'btn-secondary py-2'}
+            onClick={() => setTab('customers')}
+          >
+            Customers
+          </button>
+        </div>
+
+        <div className="card">
+          {tab === 'orders' ? <OrderQueue /> : <CustomerList />}
         </div>
       </main>
     </div>

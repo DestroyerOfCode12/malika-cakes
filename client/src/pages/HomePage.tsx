@@ -11,8 +11,8 @@ const HomePage: React.FC = () => {
             <span className="hover-wiggle inline-block">🧁</span> Malika's
           </h1>
           <div className="space-x-6 font-medium">
-            <a href="#home" className="hover:text-pink transition-colors">Home</a>
-            <a href="#about" className="hover:text-pink transition-colors">About</a>
+            <Link to="/order" className="hover:text-pink transition-colors">Order</Link>
+            <Link to="/order-status" className="hover:text-pink transition-colors">Track Order</Link>
             <Link to="/faq" className="hover:text-pink transition-colors">FAQ</Link>
             <Link to="/admin/login" className="hover:text-pink transition-colors">Admin</Link>
           </div>

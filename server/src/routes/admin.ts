@@ -2,7 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../app';
 import { authMiddleware, requireAdmin, AuthRequest } from '../middleware/auth';
 import { ApiError } from '../middleware/errorHandler';
-import { AdminDashboardStats, PaginationParams } from '../types';
+import { AdminDashboardStats } from '../types';
+import { emailService } from '../services/emailService';
 
 const router = Router();
 
@@ -40,6 +41,9 @@ router.get('/orders', async (req: AuthRequest, res: Response, next: NextFunction
           size: true,
           flavor: true,
           filling: true,
+          customizations: {
+            include: { topper: true },
+          },
         },
         orderBy: {
           [sortBy as string]: sortOrder,
@@ -118,10 +122,7 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
 
     const updatedOrder = await prisma.order.update({
       where: { id },
-      data: {
-        status,
-        // TODO: Store notes in audit log
-      },
+      data: { status },
       include: {
         customer: true,
         size: true,
@@ -132,6 +133,35 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
         },
       },
     });
+
+    // Audit trail for status changes
+    await prisma.auditLog.create({
+      data: {
+        entityType: 'order',
+        entityId: id,
+        action: 'status_change',
+        oldValues: JSON.stringify({ status: order.status }),
+        newValues: JSON.stringify({ status, notes: notes || null }),
+        userId: req.user?.id,
+      },
+    });
+
+    // Notify customer when their cake is ready
+    if (status === 'ready' && updatedOrder.customer.email) {
+      void emailService.sendReadyNotification({
+        customerName: updatedOrder.customer.name,
+        customerEmail: updatedOrder.customer.email,
+        orderNumber: updatedOrder.orderNumber,
+        sizeName: updatedOrder.size.name,
+        flavorName: updatedOrder.flavor.name,
+        fillingName: updatedOrder.filling.name,
+        topperNames: updatedOrder.customizations.map((c) => c.topper.name),
+        totalPrice: updatedOrder.totalPrice,
+        pickupDate: updatedOrder.pickupDate,
+        pickupTime: updatedOrder.pickupTime,
+        paymentDueDate: updatedOrder.paymentDueDate,
+      });
+    }
 
     res.json({
       message: 'Order status updated',

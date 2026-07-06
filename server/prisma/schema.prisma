@@ -1,6 +1,8 @@
 // Malika's Cake Boutique Prisma Schema
+// Dev uses SQLite (zero-install). For production Postgres, switch the
+// provider to "postgresql" and restore Decimal types for money fields.
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -9,25 +11,25 @@ generator client {
 }
 
 model Customer {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @db.VarChar(255)
-  email     String?  @unique @db.VarChar(255)
-  phone     String?  @db.VarChar(20)
+  id        String   @id @default(uuid())
+  name      String
+  email     String?  @unique
+  phone     String?
   orders    Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("customers")
 }
 
 model CatalogSize {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String   @unique @db.VarChar(100)
-  basePrice   Decimal  @map("base_price") @db.Decimal(8, 2)
+  id          String   @id @default(uuid())
+  name        String   @unique
+  basePrice   Float    @map("base_price")
   servingsMin Int?     @map("servings_min")
   servingsMax Int?     @map("servings_max")
   description String?
-  imageUrl    String?  @map("image_url") @db.VarChar(500)
+  imageUrl    String?  @map("image_url")
   isActive    Boolean  @default(true) @map("is_active")
   orders      Order[]
   createdAt   DateTime @default(now()) @map("created_at")
@@ -37,22 +39,22 @@ model CatalogSize {
 }
 
 model CatalogFlavor {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @unique @db.VarChar(100)
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
-  imageUrl  String?  @map("image_url") @db.VarChar(500)
-  isActive  Boolean  @default(true) @map("is_active")
-  orders    Order[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  imageUrl    String?  @map("image_url")
+  isActive    Boolean  @default(true) @map("is_active")
+  orders      Order[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("catalog_flavors")
 }
 
 model CatalogFilling {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String   @unique @db.VarChar(100)
-  priceAddon Decimal  @map("price_addon") @db.Decimal(8, 2)
+  id         String   @id @default(uuid())
+  name       String   @unique
+  priceAddon Float    @map("price_addon")
   isActive   Boolean  @default(true) @map("is_active")
   orders     Order[]
   createdAt  DateTime @default(now()) @map("created_at")
@@ -62,56 +64,56 @@ model CatalogFilling {
 }
 
 model CatalogTopper {
-  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String                 @unique @db.VarChar(100)
-  priceAddon           Decimal                @map("price_addon") @db.Decimal(8, 2)
-  imageUrl             String?                @map("image_url") @db.VarChar(500)
-  isActive             Boolean                @default(true) @map("is_active")
-  orderCustomizations  OrderCustomization[]
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @updatedAt @map("updated_at")
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  priceAddon          Float                @map("price_addon")
+  imageUrl            String?              @map("image_url")
+  isActive            Boolean              @default(true) @map("is_active")
+  orderCustomizations OrderCustomization[]
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
 
   @@map("catalog_toppers")
 }
 
 model Order {
-  id                     String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  customerId            String                 @map("customer_id") @db.Uuid
-  customer              Customer               @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  orderNumber           String                 @unique @db.VarChar(20)
-  sizeId                String                 @map("size_id") @db.Uuid
-  size                  CatalogSize            @relation(fields: [sizeId], references: [id])
-  flavorId              String                 @map("flavor_id") @db.Uuid
-  flavor                CatalogFlavor          @relation(fields: [flavorId], references: [id])
-  fillingId             String                 @map("filling_id") @db.Uuid
-  filling               CatalogFilling         @relation(fields: [fillingId], references: [id])
+  id          String        @id @default(uuid())
+  customerId  String        @map("customer_id")
+  customer    Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderNumber String        @unique @map("order_number")
+  sizeId      String        @map("size_id")
+  size        CatalogSize   @relation(fields: [sizeId], references: [id])
+  flavorId    String        @map("flavor_id")
+  flavor      CatalogFlavor @relation(fields: [flavorId], references: [id])
+  fillingId   String        @map("filling_id")
+  filling     CatalogFilling @relation(fields: [fillingId], references: [id])
 
   // Pricing
-  basePrice             Decimal                @map("base_price") @db.Decimal(8, 2)
-  customizationTotal    Decimal                @default(0) @map("customization_total") @db.Decimal(8, 2)
-  tax                   Decimal                @default(0) @db.Decimal(8, 2)
-  totalPrice            Decimal                @map("total_price") @db.Decimal(8, 2)
+  basePrice          Float @map("base_price")
+  customizationTotal Float @default(0) @map("customization_total")
+  tax                Float @default(0)
+  totalPrice         Float @map("total_price")
 
-  // Dates & Times
-  orderDate             DateTime               @default(now()) @map("order_date") @db.Date
-  pickupDate            DateTime               @map("pickup_date") @db.Date
-  pickupTime            DateTime               @default(dbgenerated("'12:00:00'::time")) @map("pickup_time") @db.Time
-  paymentDueDate        DateTime               @map("payment_due_date") @db.Date
+  // Dates & Times (pickupTime stored as "HH:mm" string)
+  orderDate      DateTime @default(now()) @map("order_date")
+  pickupDate     DateTime @map("pickup_date")
+  pickupTime     String   @default("12:00") @map("pickup_time")
+  paymentDueDate DateTime @map("payment_due_date")
 
-  // Status
-  status                String                 @default("draft") @db.VarChar(50)
-  paymentStatus         String                 @default("unpaid") @map("payment_status") @db.VarChar(50)
+  // Status: draft | confirmed | paid | in_progress | ready | picked_up | cancelled
+  status        String @default("draft")
+  // Payment: unpaid | paid | refunded
+  paymentStatus String @default("unpaid") @map("payment_status")
 
   // Special Requests
-  allergiesRestrictions String?                @map("allergies_restrictions")
-  specialRequests       String?                @map("special_requests")
-  recipientPhone        String?                @map("recipient_phone") @db.VarChar(20)
+  allergiesRestrictions String? @map("allergies_restrictions")
+  specialRequests       String? @map("special_requests")
+  recipientPhone        String? @map("recipient_phone")
 
-  // Relations
-  customizations        OrderCustomization[]
+  customizations OrderCustomization[]
 
-  createdAt             DateTime               @default(now()) @map("created_at")
-  updatedAt             DateTime               @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([customerId])
   @@index([pickupDate])
@@ -121,13 +123,13 @@ model Order {
 }
 
 model OrderCustomization {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId     String        @map("order_id") @db.Uuid
+  id          String        @id @default(uuid())
+  orderId     String        @map("order_id")
   order       Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  topperId    String        @map("topper_id") @db.Uuid
+  topperId    String        @map("topper_id")
   topper      CatalogTopper @relation(fields: [topperId], references: [id])
   quantity    Int           @default(1)
-  priceAtTime Decimal       @map("price_at_time") @db.Decimal(8, 2)
+  priceAtTime Float         @map("price_at_time")
   createdAt   DateTime      @default(now()) @map("created_at")
 
   @@index([orderId])
@@ -135,27 +137,27 @@ model OrderCustomization {
 }
 
 model AdminUser {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email     String   @unique @db.VarChar(255)
-  passwordHash String  @map("password_hash") @db.VarChar(255)
-  role      String   @default("viewer") @db.VarChar(50)
-  isActive  Boolean  @default(true) @map("is_active")
-  lastLogin DateTime? @map("last_login")
-  createdAt DateTime @default(now()) @map("created_at")
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         String    @default("viewer")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
   @@index([email])
   @@map("admin_users")
 }
 
 model AuditLog {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  entityType String? @map("entity_type") @db.VarChar(50)
-  entityId  String?  @map("entity_id") @db.Uuid
-  action    String?  @map("action") @db.VarChar(50)
-  oldValues Json?    @map("old_values")
-  newValues Json?    @map("new_values")
-  userId    String?  @map("user_id") @db.Uuid
-  timestamp DateTime @default(now())
+  id         String   @id @default(uuid())
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  action     String?
+  oldValues  String?  @map("old_values")
+  newValues  String?  @map("new_values")
+  userId     String?  @map("user_id")
+  timestamp  DateTime @default(now())
 
   @@map("audit_logs")
 }

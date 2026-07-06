@@ -9,6 +9,7 @@ import {
   calculateRefund,
 } from '../utils/validation';
 import { calculateOrderPrice, calculateToppersPrice } from '../utils/pricing';
+import { emailService } from '../services/emailService';
 
 const router = Router();
 
@@ -136,12 +137,62 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       },
     });
 
-    // TODO: Send confirmation email
+    // Send confirmation email (non-blocking; failures are logged, not thrown)
+    void emailService.sendOrderConfirmation({
+      customerName: customer.name,
+      customerEmail: customer.email || dto.email,
+      orderNumber: order.orderNumber,
+      sizeName: order.size.name,
+      flavorName: order.flavor.name,
+      fillingName: order.filling.name,
+      topperNames: order.customizations.map((c) => c.topper.name),
+      allergies: order.allergiesRestrictions,
+      specialRequests: order.specialRequests,
+      totalPrice: order.totalPrice,
+      pickupDate: order.pickupDate,
+      pickupTime: order.pickupTime,
+      paymentDueDate: order.paymentDueDate,
+    });
 
     res.status(201).json({
       message: 'Order created successfully',
       data: order,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /orders/lookup - Customer order status lookup by order number + email
+ * (Must be declared before /:id so "lookup" isn't matched as an id.)
+ */
+router.get('/lookup', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orderNumber = String(req.query.orderNumber || '').trim();
+    const email = String(req.query.email || '').trim().toLowerCase();
+
+    if (!orderNumber || !email) {
+      throw new ApiError(400, 'Order number and email are required');
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: {
+        customer: true,
+        size: true,
+        flavor: true,
+        filling: true,
+        customizations: { include: { topper: true } },
+      },
+    });
+
+    // Require the email to match so strangers can't look up arbitrary orders
+    if (!order || (order.customer.email || '').toLowerCase() !== email) {
+      throw new ApiError(404, 'No order found matching that order number and email');
+    }
+
+    res.json({ data: order });
   } catch (err) {
     next(err);
   }

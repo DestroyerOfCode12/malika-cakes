@@ -43,6 +43,9 @@ const OrderConfirmation: React.FC = () => {
         <Link to="/" onClick={resetForm} className="btn-outline">
           Back to Home
         </Link>
+        <Link to="/order-status" onClick={resetForm} className="btn-secondary">
+          Track My Order
+        </Link>
         <Link to="/order" onClick={resetForm} className="btn-primary">
           Place Another Order
         </Link>

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { app, prisma } from './app';
 
 const PORT = process.env.PORT || 3000;

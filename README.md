@@ -15,46 +15,50 @@ malika/
 
 ## Tech Stack
 
-- **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, Zustand, React Hook Form
-- **Backend:** Node.js, Express, TypeScript, Prisma ORM, PostgreSQL
+- **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, Zustand
+- **Backend:** Node.js, Express, TypeScript, Prisma ORM
+- **Database:** SQLite in dev (zero install); PostgreSQL for production
 - **Hosting:** Vercel (frontend), Railway/Render (backend)
-- **Email:** SendGrid
+- **Email:** Nodemailer (logs to console when SMTP is unconfigured)
 - **Auth:** JWT (24hr tokens, bcrypt passwords)
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL (local or cloud)
-- npm or yarn
+- Node.js 18+ and npm — that's it (dev DB is SQLite, no database server needed)
 
 ### Backend Setup
 ```bash
 cd server
 npm install
-cp .env.example .env.local
-npm run db:migrate
-npm run dev
+cp .env.example .env    # defaults work out of the box
+npx prisma db push      # create SQLite dev.db from schema
+npm run db:seed         # catalog + admin user
+npm run dev             # http://localhost:3000
 ```
 
 ### Frontend Setup
 ```bash
 cd client
 npm install
-npm run dev
+npm run dev             # http://localhost:5173 (proxies /api to :3000)
 ```
 
-Visit `http://localhost:5173` (frontend) and `http://localhost:3000` (backend).
+### Default Admin Login
+- Email: `admin@malikacakes.co.za`
+- Password: `admin123` (change via ADMIN_PASSWORD in .env before re-seeding)
 
 ## Phase 1 Deliverables (Sep–Oct 2026)
 
 - [x] Database schema & migrations
-- [x] Order form (7-step wizard)
-- [x] Admin dashboard (order queue)
+- [x] Order form (7-step wizard, live pricing, draft persistence)
+- [x] Admin dashboard (stats, order queue with filters, order detail, status & payment updates, customers)
+- [x] Customer order-status lookup (order # + email, status timeline)
 - [x] Authentication (JWT)
-- [x] Email service (confirmations)
-- [x] Pricing engine
-- [x] Lead-time validation
+- [x] Email service (confirmation + ready-for-pickup; console fallback without SMTP)
+- [x] Pricing engine (base + add-ons + 15% VAT)
+- [x] Lead-time validation (14 days, client + server)
+- [x] Audit log on admin status changes
 - [ ] Testing suite
 - [ ] Deployment pipeline
 
