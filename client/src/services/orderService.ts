@@ -21,4 +21,10 @@ export const orderService = {
     const response = await apiClient.delete(`/orders/${id}`);
     return response.data;
   },
+
+  async lookupOrder(orderNumber: string, email: string): Promise<Order> {
+    const query = new URLSearchParams({ orderNumber, email });
+    const response = await apiClient.get<ApiResponse<Order>>(`/orders/lookup?${query.toString()}`);
+    return response.data.data;
+  },
 };
