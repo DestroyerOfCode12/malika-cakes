@@ -9,7 +9,7 @@ const OrderConfirmation: React.FC = () => {
   if (!submittedOrder) return null;
 
   return (
-    <div className="text-center py-6 animate-fade-in">
+    <div className="text-center py-6 animate-rise">
       <div className="text-6xl mb-4 animate-pop">🎉🧁</div>
       <h2 className="text-2xl font-bold text-charcoal mb-2">Order Confirmed!</h2>
       <p className="text-gray-600 mb-6">

@@ -2,14 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom variables — palette lifted from the Malika's logo (pink + charcoal + white) */
+/* Custom variables — palette lifted from the Malika's logo (pink + blush + charcoal + white) */
 :root {
   --color-pink: #DB2777;
   --color-pink-light: #FDF2F8;
+  --color-blush: #F7C8D3;
   --color-charcoal: #3F3F46;
   --color-cream: #FFF8FA;
 
-  --font-script: 'Pacifico', cursive;
+  --font-script: 'Kaushan Script', cursive;
   --font-sans: 'Poppins', Inter, sans-serif;
 }
 
@@ -74,28 +75,94 @@ h1, h2, h3 {
   @apply border-t border-gray-200 my-6;
 }
 
-/* Animations */
+/* ============ Animations ============ */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Playful hover wiggle for fun decorative icons/emoji */
+/* Rise: fade in while drifting up — the workhorse entrance */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-rise {
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Scale-in for modals/popovers */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Gentle continuous float for the hero logo */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4.5s ease-in-out infinite;
+}
+
+/* Stagger helpers — pair with animate-rise on sibling elements */
+.delay-75 { animation-delay: 75ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-225 { animation-delay: 225ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-450 { animation-delay: 450ms; }
+
+/* Scroll reveal — starts hidden, .revealed (added by <Reveal>) plays the entrance */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Playful hover wiggle for decorative icons and the logo cupcake */
 .hover-wiggle:hover {
   animation: wiggle 0.4s ease-in-out;
+}
+
+.group-logo:hover .logo-cupcake {
+  animation: wiggle 0.5s ease-in-out;
+  transform-origin: center bottom;
 }
 
 @keyframes wiggle {
   0%, 100% { transform: rotate(-6deg); }
   50% { transform: rotate(6deg); }
+}
+
+/* Accessibility: turn all of it off for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Responsive adjustments */

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Order } from '../types';
 import { orderService } from '../services/orderService';
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../utils/formatters';
+import Logo from '../components/Logo';
 
 const STATUS_STEPS = ['confirmed', 'paid', 'in_progress', 'ready', 'picked_up'];
 
@@ -38,16 +39,16 @@ const OrderStatusPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream">
-      <header className="bg-charcoal text-white py-4">
+      <header className="bg-charcoal text-white py-3">
         <div className="container-custom flex justify-between items-center">
-          <Link to="/" className="brand-logo text-2xl">🧁 Malika's</Link>
+          <Link to="/" className="group-logo"><Logo onDark /></Link>
           <h1 className="text-xl font-semibold text-white">Order Status</h1>
           <div></div>
         </div>
       </header>
 
       <main className="container-custom py-12">
-        <div className="card max-w-2xl mx-auto">
+        <div className="card max-w-2xl mx-auto animate-rise">
           <h2 className="text-2xl font-bold mb-2">Check Your Order Status</h2>
           <p className="text-gray-600 mb-6">
             Enter the order number from your confirmation email (e.g. ORD-20260915-0001).

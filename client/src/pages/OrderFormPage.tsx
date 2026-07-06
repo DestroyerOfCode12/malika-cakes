@@ -4,6 +4,7 @@ import { useOrderFormStore } from '../store/orderFormStore';
 import { useCatalogStore } from '../store/catalogStore';
 import OrderFormWizard from '../components/OrderForm/OrderFormWizard';
 import PriceSummary from '../components/OrderForm/PriceSummary';
+import Logo from '../components/Logo';
 
 const OrderFormPage: React.FC = () => {
   const { fetchCatalog } = useCatalogStore();
@@ -16,9 +17,9 @@ const OrderFormPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-charcoal text-white py-4">
+      <header className="bg-charcoal text-white py-3">
         <div className="container-custom flex justify-between items-center">
-          <Link to="/" className="brand-logo text-2xl">🧁 Malika's</Link>
+          <Link to="/" className="group-logo"><Logo onDark /></Link>
           <h1 className="text-xl font-semibold text-white">Custom Cake Order</h1>
           <div></div>
         </div>
