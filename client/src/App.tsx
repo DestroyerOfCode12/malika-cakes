@@ -11,6 +11,8 @@ import AdminPage from './pages/AdminPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import FAQPage from './pages/FAQPage';
 import NotFoundPage from './pages/NotFoundPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentCancelledPage from './pages/PaymentCancelledPage';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -36,6 +38,8 @@ function App() {
           <Route path="/order" element={<OrderFormPage />} />
           <Route path="/order-status" element={<OrderStatusPage />} />
           <Route path="/faq" element={<FAQPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/cancelled" element={<PaymentCancelledPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
 
           {/* Protected admin route */}

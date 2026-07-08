@@ -11,6 +11,7 @@ import {
 import { calculateOrderPrice, calculateToppersPrice, parsePickupTime, formatPickupTime } from '../utils/pricing';
 import { emailService } from '../services/emailService';
 import { serializeOrder } from '../utils/serialize';
+import { buildPayfastPaymentFields, isPayfastConfigured } from '../services/paymentService';
 
 const router = Router();
 
@@ -224,6 +225,59 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.json({ data: serializeOrder(order) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /orders/:id/pay - Get signed PayFast payment fields for an order.
+ * The frontend builds a hidden form from these fields and submits it,
+ * navigating the browser to PayFast's hosted payment page.
+ */
+router.post('/:id/pay', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!isPayfastConfigured()) {
+      throw new ApiError(
+        503,
+        'Online payment is not configured yet. Please arrange payment manually for now.'
+      );
+    }
+
+    const { id } = req.params;
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { customer: true, size: true, flavor: true },
+    });
+
+    if (!order) {
+      throw new ApiError(404, 'Order not found');
+    }
+
+    if (order.paymentStatus === 'paid') {
+      throw new ApiError(400, 'This order has already been paid');
+    }
+
+    if (!order.customer.email) {
+      throw new ApiError(400, 'Order has no customer email on file');
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+
+    const payment = buildPayfastPaymentFields({
+      orderNumber: order.orderNumber,
+      amount: Number(order.totalPrice),
+      itemName: `${order.size.name} ${order.flavor.name} Cake (${order.orderNumber})`,
+      customerName: order.customer.name,
+      customerEmail: order.customer.email,
+      returnUrl: `${frontendUrl}/payment/success?order=${order.orderNumber}`,
+      cancelUrl: `${frontendUrl}/payment/cancelled?order=${order.orderNumber}`,
+      notifyUrl: `${backendUrl}/api/payments/payfast/notify`,
+    });
+
+    res.json({ data: payment });
   } catch (err) {
     next(err);
   }
