@@ -4,6 +4,8 @@ import { authMiddleware, requireAdmin, AuthRequest } from '../middleware/auth';
 import { ApiError } from '../middleware/errorHandler';
 import { AdminDashboardStats } from '../types';
 import { emailService } from '../services/emailService';
+import { serializeOrder, serializeOrders } from '../utils/serialize';
+import { formatPickupTime } from '../utils/pricing';
 
 const router = Router();
 
@@ -55,7 +57,7 @@ router.get('/orders', async (req: AuthRequest, res: Response, next: NextFunction
     ]);
 
     res.json({
-      data: orders,
+      data: serializeOrders(orders),
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -92,7 +94,7 @@ router.get('/orders/:id', async (req: AuthRequest, res: Response, next: NextFunc
       throw new ApiError(404, 'Order not found');
     }
 
-    res.json({ data: order });
+    res.json({ data: serializeOrder(order) });
   } catch (err) {
     next(err);
   }
@@ -140,8 +142,8 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
         entityType: 'order',
         entityId: id,
         action: 'status_change',
-        oldValues: JSON.stringify({ status: order.status }),
-        newValues: JSON.stringify({ status, notes: notes || null }),
+        oldValues: { status: order.status },
+        newValues: { status, notes: notes || null },
         userId: req.user?.id,
       },
     });
@@ -156,16 +158,16 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
         flavorName: updatedOrder.flavor.name,
         fillingName: updatedOrder.filling.name,
         topperNames: updatedOrder.customizations.map((c) => c.topper.name),
-        totalPrice: updatedOrder.totalPrice,
+        totalPrice: Number(updatedOrder.totalPrice),
         pickupDate: updatedOrder.pickupDate,
-        pickupTime: updatedOrder.pickupTime,
+        pickupTime: formatPickupTime(updatedOrder.pickupTime),
         paymentDueDate: updatedOrder.paymentDueDate,
       });
     }
 
     res.json({
       message: 'Order status updated',
-      data: updatedOrder,
+      data: serializeOrder(updatedOrder),
     });
   } catch (err) {
     next(err);
@@ -204,7 +206,7 @@ router.patch('/orders/:id/payment-status', async (req: AuthRequest, res: Respons
 
     res.json({
       message: 'Payment status updated',
-      data: updatedOrder,
+      data: serializeOrder(updatedOrder),
     });
   } catch (err) {
     next(err);
@@ -276,7 +278,7 @@ router.get('/dashboard', async (req: AuthRequest, res: Response, next: NextFunct
 
     res.json({
       data: stats,
-      recentOrders,
+      recentOrders: serializeOrders(recentOrders),
     });
   } catch (err) {
     next(err);
