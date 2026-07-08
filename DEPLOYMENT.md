@@ -55,6 +55,10 @@ postgresql://user:password@host:5432/dbname?sslmode=require
    | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | credentials for the seeded admin login |
    | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | your email provider, or leave `SMTP_HOST` empty to log emails to the server console instead of sending |
    | `EMAIL_FROM` / `EMAIL_FROM_NAME` | sender identity for outgoing emails |
+   | `FRONTEND_URL` | your Netlify URL (needed once you know it — see step 3; PayFast redirects use this) |
+   | `BACKEND_URL` | this backend's own public URL (PayFast's payment-confirmation webhook needs to reach it) |
+   | `PAYFAST_MODE` | `sandbox` for testing, `live` to go live |
+   | `PAYFAST_MERCHANT_ID` / `PAYFAST_MERCHANT_KEY` / `PAYFAST_PASSPHRASE` | from your PayFast (sandbox or live) merchant account — see **PayFast setup** below. Leave unset and "Pay Now" just returns a clear error instead of breaking, so it's safe to deploy before these are ready. |
 7. Deploy. Once it's live, run the seed script once (Railway/Render both
    let you run one-off commands against the deployed environment):
    ```
@@ -79,6 +83,31 @@ React Router needs).
 4. Go back to your backend host and set `CORS_ORIGIN` to the Netlify URL
    you were just given (e.g. `https://malikas-cakes.netlify.app`), then
    redeploy the backend so the new origin takes effect.
+
+## PayFast setup (online payments)
+
+PayFast retired anonymous public sandbox credentials — a free sandbox
+account (still no real bank/business details needed) is required even for
+test payments:
+
+1. Sign up at **[sandbox.payfast.co.za](https://sandbox.payfast.co.za)**.
+2. In the sandbox merchant dashboard, find your **Merchant ID** and
+   **Merchant Key**, and set a **Passphrase** (Settings → Integration) —
+   without a passphrase, signature verification will fail.
+3. Set `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, and
+   `PAYFAST_PASSPHRASE` on your backend host to those values, with
+   `PAYFAST_MODE=sandbox`.
+4. Test with PayFast's published sandbox test card numbers (available on
+   their sandbox docs) — no real money moves in sandbox mode.
+5. When ready to accept real payments: register a live PayFast merchant
+   account, generate live Merchant ID/Key/Passphrase, and change
+   `PAYFAST_MODE=live` plus the three credential variables to the live
+   ones.
+
+Until these are set, the "Pay Now with PayFast" button on the order
+confirmation screen shows a friendly "not set up yet" message instead of
+breaking — customers can still be told to arrange payment manually via
+the order's contact details in the meantime.
 
 ## 4. Verify
 

@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { formatPrice, formatDate } from '../../utils/formatters';
+import { paymentService } from '../../services/paymentService';
 
 const OrderConfirmation: React.FC = () => {
   const { submittedOrder, resetForm } = useOrderFormStore();
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
 
   if (!submittedOrder) return null;
+
+  const handlePayNow = async () => {
+    setPaying(true);
+    setPayError(null);
+    try {
+      const payment = await paymentService.getPayfastPayment(submittedOrder.id);
+      paymentService.redirectToPayfast(payment);
+      // Browser navigates away to PayFast here — no further state needed.
+    } catch (err: any) {
+      if (err?.response?.status === 503) {
+        setPayError("Online payment isn't set up yet — we'll be in touch to arrange payment manually.");
+      } else {
+        setPayError(err?.response?.data?.error || 'Could not start payment. Please try again.');
+      }
+      setPaying(false);
+    }
+  };
 
   return (
     <div className="text-center py-6 animate-rise">
@@ -35,9 +55,21 @@ const OrderConfirmation: React.FC = () => {
         </div>
       </div>
 
-      <p className="text-sm text-gray-500 mb-8">
-        We'll be in touch to arrange payment before your deadline. Keep your order number handy!
-      </p>
+      <div className="max-w-md mx-auto mb-6">
+        <button
+          type="button"
+          onClick={handlePayNow}
+          disabled={paying}
+          className="btn-primary w-full"
+        >
+          {paying ? 'Redirecting to secure payment...' : '🔒 Pay Now with PayFast'}
+        </button>
+        {payError && <p className="text-sm text-red-600 mt-2">{payError}</p>}
+        <p className="text-sm text-gray-500 mt-3">
+          Prefer to pay another way? We'll be in touch to arrange payment before your deadline —
+          keep your order number handy!
+        </p>
+      </div>
 
       <div className="flex flex-col sm:flex-row justify-center gap-3">
         <Link to="/" onClick={resetForm} className="btn-outline">
