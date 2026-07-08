@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Order } from '../../types';
 import { adminService } from '../../services/adminService';
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/formatters';
@@ -15,6 +15,18 @@ interface OrderDetailProps {
 const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Focus the close button on open (so keyboard users land inside the
+  // dialog) and let Escape dismiss it, matching native dialog behavior.
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const changeStatus = async (status: string) => {
     if (status === order.status) return;
@@ -49,15 +61,23 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) 
       <div
         className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="order-detail-title"
       >
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-xl font-bold">{order.orderNumber}</h3>
+            <h2 id="order-detail-title" className="text-xl font-bold">{order.orderNumber}</h2>
             <span className={`badge-status ${getStatusColor(order.status)}`}>
               {getStatusLabel(order.status)}
             </span>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-charcoal text-2xl leading-none">
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            aria-label="Close order details"
+            className="text-gray-400 hover:text-charcoal text-2xl leading-none rounded-full w-8 h-8 flex items-center justify-center"
+          >
             ×
           </button>
         </div>
@@ -147,8 +167,12 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) 
           </div>
         </div>
 
-        {error && <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-4">{error}</div>}
-        {saving && <p className="text-sm text-gray-400 mt-2">Saving...</p>}
+        {error && (
+          <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-4">
+            {error}
+          </div>
+        )}
+        {saving && <p role="status" aria-live="polite" className="text-sm text-gray-400 mt-2">Saving...</p>}
       </div>
     </div>
   );

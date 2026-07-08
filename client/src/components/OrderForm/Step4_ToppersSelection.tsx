@@ -2,13 +2,20 @@ import React from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { useCatalogStore } from '../../store/catalogStore';
 import { formatPrice } from '../../utils/formatters';
+import { CardGridSkeleton } from '../Skeleton';
 
 const Step4_ToppersSelection: React.FC = () => {
   const { formData, addTopper, removeTopper } = useOrderFormStore();
   const { toppers, loading } = useCatalogStore();
 
   if (loading) {
-    return <p className="text-center text-gray-500 py-8">Loading toppers...</p>;
+    return (
+      <div>
+        <h2 className="text-xl font-bold mb-2">Add Toppers & Decorations</h2>
+        <p className="text-gray-600 mb-6">Optional — select as many as you'd like.</p>
+        <CardGridSkeleton count={8} />
+      </div>
+    );
   }
 
   const toggleTopper = (topperId: string, price: number) => {
@@ -21,7 +28,7 @@ const Step4_ToppersSelection: React.FC = () => {
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-2">Add Toppers & Decorations</h3>
+      <h2 className="text-xl font-bold mb-2">Add Toppers & Decorations</h2>
       <p className="text-gray-600 mb-6">Optional — select as many as you'd like.</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -43,7 +50,7 @@ const Step4_ToppersSelection: React.FC = () => {
                 <span className="absolute top-2 right-2 text-pink text-lg">✓</span>
               )}
               <div className="text-2xl mb-2 hover-wiggle">✨</div>
-              <h4 className="font-medium text-sm">{topper.name}</h4>
+              <h3 className="font-medium text-sm">{topper.name}</h3>
               <p className="text-pink font-bold text-sm mt-1">
                 {price > 0 ? `+${formatPrice(price)}` : 'Free'}
               </p>

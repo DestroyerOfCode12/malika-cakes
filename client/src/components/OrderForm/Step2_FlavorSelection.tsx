@@ -1,18 +1,25 @@
 import React from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { useCatalogStore } from '../../store/catalogStore';
+import { CardGridSkeleton } from '../Skeleton';
 
 const Step2_FlavorSelection: React.FC = () => {
   const { formData, setFlavor } = useOrderFormStore();
   const { flavors, loading } = useCatalogStore();
 
   if (loading) {
-    return <p className="text-center text-gray-500 py-8">Loading flavors...</p>;
+    return (
+      <div>
+        <h2 className="text-xl font-bold mb-2">Pick Your Flavor</h2>
+        <p className="text-gray-600 mb-6">Choose one flavor for your cake.</p>
+        <CardGridSkeleton count={6} />
+      </div>
+    );
   }
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-2">Pick Your Flavor</h3>
+      <h2 className="text-xl font-bold mb-2">Pick Your Flavor</h2>
       <p className="text-gray-600 mb-6">Choose one flavor for your cake.</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -30,7 +37,7 @@ const Step2_FlavorSelection: React.FC = () => {
               }`}
             >
               <div className="text-3xl mb-2 hover-wiggle">🍰</div>
-              <h4 className="font-bold">{flavor.name}</h4>
+              <h3 className="font-bold">{flavor.name}</h3>
               {flavor.description && (
                 <p className="text-xs text-gray-500 mt-1">{flavor.description}</p>
               )}

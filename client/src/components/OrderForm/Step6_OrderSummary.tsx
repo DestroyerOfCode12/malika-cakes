@@ -29,7 +29,7 @@ const Step6_OrderSummary: React.FC = () => {
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-2">Review Your Order</h3>
+      <h2 className="text-xl font-bold mb-2">Review Your Order</h2>
       <p className="text-gray-600 mb-6">Check everything looks right before proceeding to payment.</p>
 
       <div className="space-y-4">

@@ -48,19 +48,48 @@ h1, h2, h3 {
 }
 
 .btn-primary {
-  @apply bg-pink text-white hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold shadow-md shadow-pink/20;
+  @apply bg-pink text-white hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold shadow-md shadow-pink/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pink/40;
 }
 
 .btn-secondary {
-  @apply bg-pink-light text-pink hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold;
+  @apply bg-pink-light text-pink hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pink/40;
 }
 
 .btn-outline {
-  @apply border-2 border-pink text-pink hover:bg-pink hover:text-white hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold;
+  @apply border-2 border-pink text-pink hover:bg-pink hover:text-white hover:scale-105 active:scale-95 transition-all px-6 py-3 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pink/40;
 }
 
 .input-base {
   @apply w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink;
+}
+
+/* Universal keyboard focus ring for anything not already covered above
+   (links, selectable cards, table rows) — WCAG 2.4.7 */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.45);
+  border-radius: 0.5rem;
+}
+
+/* Skeleton loader — shimmering placeholder so layout doesn't pop on data arrival */
+.skeleton {
+  @apply bg-pink-light rounded-xl relative overflow-hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(219, 39, 119, 0.08), transparent);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
 .badge-status {
