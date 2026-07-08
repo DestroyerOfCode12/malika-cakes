@@ -55,28 +55,40 @@ const OrderStatusPage: React.FC = () => {
           </p>
 
           <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
-            <input
-              type="text"
-              className="input-base"
-              placeholder="Order number"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              disabled={loading}
-            />
-            <input
-              type="email"
-              className="input-base"
-              placeholder="Email used on the order"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
+            <div>
+              <label htmlFor="lookup-order-number" className="sr-only">Order number</label>
+              <input
+                id="lookup-order-number"
+                type="text"
+                className="input-base"
+                placeholder="Order number"
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="lookup-email" className="sr-only">Email used on the order</label>
+              <input
+                id="lookup-email"
+                type="email"
+                className="input-base"
+                placeholder="Email used on the order"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
             <button type="submit" className="btn-primary sm:col-span-2" disabled={loading}>
               {loading ? 'Searching...' : 'Find My Order 🔍'}
             </button>
           </form>
 
-          {error && <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-4">{error}</div>}
+          {error && (
+            <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-4">
+              {error}
+            </div>
+          )}
         </div>
 
         {order && (

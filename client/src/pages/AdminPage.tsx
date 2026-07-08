@@ -52,6 +52,8 @@ const AdminPage: React.FC = () => {
       </header>
 
       <main className="container-custom py-8">
+        <h1 className="sr-only">Admin Dashboard</h1>
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {statCards.map((card, idx) => (
@@ -66,14 +68,22 @@ const AdminPage: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6" role="tablist" aria-label="Admin sections">
           <button
+            role="tab"
+            aria-selected={tab === 'orders'}
+            aria-controls="admin-panel"
+            id="tab-orders"
             className={tab === 'orders' ? 'btn-primary py-2' : 'btn-secondary py-2'}
             onClick={() => setTab('orders')}
           >
             Order Queue
           </button>
           <button
+            role="tab"
+            aria-selected={tab === 'customers'}
+            aria-controls="admin-panel"
+            id="tab-customers"
             className={tab === 'customers' ? 'btn-primary py-2' : 'btn-secondary py-2'}
             onClick={() => setTab('customers')}
           >
@@ -81,7 +91,7 @@ const AdminPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="card">
+        <div className="card" id="admin-panel" role="tabpanel" aria-labelledby={tab === 'orders' ? 'tab-orders' : 'tab-customers'}>
           {tab === 'orders' ? <OrderQueue /> : <CustomerList />}
         </div>
       </main>

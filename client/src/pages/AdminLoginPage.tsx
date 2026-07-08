@@ -37,9 +37,11 @@ const AdminLoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+            <label htmlFor="admin-email" className="block text-sm font-medium mb-2">Email</label>
             <input
+              id="admin-email"
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input-base"
@@ -49,9 +51,11 @@ const AdminLoginPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
+            <label htmlFor="admin-password" className="block text-sm font-medium mb-2">Password</label>
             <input
+              id="admin-password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input-base"
@@ -61,7 +65,7 @@ const AdminLoginPage: React.FC = () => {
           </div>
 
           {(error || localError) && (
-            <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
+            <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
               {error || localError}
             </div>
           )}

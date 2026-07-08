@@ -3,6 +3,7 @@ import { Order } from '../../types';
 import { adminService } from '../../services/adminService';
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/formatters';
 import OrderDetail from './OrderDetail';
+import { TableRowsSkeleton } from '../Skeleton';
 
 const STATUS_FILTERS = ['', 'confirmed', 'paid', 'in_progress', 'ready', 'picked_up', 'cancelled'];
 
@@ -75,14 +76,18 @@ const OrderQueue: React.FC = () => {
   return (
     <div>
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <label htmlFor="order-search" className="sr-only">Search orders</label>
         <input
+          id="order-search"
           type="text"
           className="input-base sm:max-w-xs"
           placeholder="Search name, order #, email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <label htmlFor="order-status-filter" className="sr-only">Filter by status</label>
         <select
+          id="order-status-filter"
           className="input-base sm:max-w-[200px]"
           value={statusFilter}
           onChange={(e) => {
@@ -98,10 +103,14 @@ const OrderQueue: React.FC = () => {
         </select>
       </div>
 
-      {error && <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4">{error}</div>}
+      {error && (
+        <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4">
+          {error}
+        </div>
+      )}
 
       {loading ? (
-        <p className="text-center text-gray-500 py-8">Loading orders...</p>
+        <TableRowsSkeleton rows={6} />
       ) : visible.length === 0 ? (
         <p className="text-center text-gray-500 py-8">No orders found. 🧁</p>
       ) : (
@@ -123,6 +132,15 @@ const OrderQueue: React.FC = () => {
                 <tr
                   key={order.id}
                   onClick={() => setSelected(order)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelected(order);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`View order ${order.orderNumber} for ${order.customer?.name}`}
                   className={`border-b cursor-pointer hover:bg-pink-light transition-colors ${rowClass(order)}`}
                 >
                   <td className="py-3 pr-3 font-medium">{order.orderNumber}</td>

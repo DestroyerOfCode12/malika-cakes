@@ -26,6 +26,12 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
   error: null,
 
   fetchCatalog: async () => {
+    const state = get();
+    // Idempotent: skip if a fetch is already in flight or data is already
+    // loaded. Multiple mounted pages (App root + OrderFormPage) can both
+    // call this on mount without triggering a duplicate network request.
+    if (state.loading || state.sizes.length > 0) return;
+
     set({ loading: true, error: null });
     try {
       const [sizes, flavors, fillings, toppers] = await Promise.all([

@@ -26,9 +26,9 @@ const HomePage: React.FC = () => {
         <div className="animate-rise animate-float inline-block">
           <Logo variant="stacked" />
         </div>
-        <h2 className="text-4xl md:text-5xl font-extrabold text-charcoal mt-8 mb-4 animate-rise delay-150">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-charcoal mt-8 mb-4 animate-rise delay-150">
           Crafted with Love 💕
-        </h2>
+        </h1>
         <p className="text-xl text-gray-600 mb-8 animate-rise delay-225">
           Custom cakes for every celebration
         </p>
@@ -43,27 +43,27 @@ const HomePage: React.FC = () => {
       <section className="bg-white py-16">
         <div className="container-custom">
           <Reveal>
-            <h3 className="text-3xl font-bold text-center mb-12">Why Choose Us?</h3>
+            <h2 className="text-3xl font-bold text-center mb-12">Why Choose Us?</h2>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Reveal delay={0}>
               <div className="card text-center h-full hover:-translate-y-1 transition-transform duration-300">
-                <div className="text-4xl mb-4 hover-wiggle inline-block">🎨</div>
-                <h4 className="text-xl font-bold mb-2">Custom Design</h4>
+                <div className="text-4xl mb-4 hover-wiggle inline-block" aria-hidden="true">🎨</div>
+                <h3 className="text-xl font-bold mb-2">Custom Design</h3>
                 <p>Personalize every detail of your cake</p>
               </div>
             </Reveal>
             <Reveal delay={120}>
               <div className="card text-center h-full hover:-translate-y-1 transition-transform duration-300">
-                <div className="text-4xl mb-4 hover-wiggle inline-block">🧁</div>
-                <h4 className="text-xl font-bold mb-2">Quality Ingredients</h4>
+                <div className="text-4xl mb-4 hover-wiggle inline-block" aria-hidden="true">🧁</div>
+                <h3 className="text-xl font-bold mb-2">Quality Ingredients</h3>
                 <p>Only the finest ingredients used</p>
               </div>
             </Reveal>
             <Reveal delay={240}>
               <div className="card text-center h-full hover:-translate-y-1 transition-transform duration-300">
-                <div className="text-4xl mb-4 hover-wiggle inline-block">📅</div>
-                <h4 className="text-xl font-bold mb-2">Easy Booking</h4>
+                <div className="text-4xl mb-4 hover-wiggle inline-block" aria-hidden="true">📅</div>
+                <h3 className="text-xl font-bold mb-2">Easy Booking</h3>
                 <p>Order online in just a few steps</p>
               </div>
             </Reveal>
@@ -75,7 +75,7 @@ const HomePage: React.FC = () => {
       <section className="bg-pink py-16">
         <div className="container-custom text-center text-white">
           <Reveal>
-            <h3 className="text-3xl font-bold mb-4 text-white">Ready to Order? 🎂</h3>
+            <h2 className="text-3xl font-bold mb-4 text-white">Ready to Order? 🎂</h2>
             <p className="text-lg mb-8 text-pink-light">Create your perfect custom cake today</p>
             <Link
               to="/order"

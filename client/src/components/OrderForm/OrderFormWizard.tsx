@@ -1,5 +1,6 @@
 import React from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
+import { useCatalogStore } from '../../store/catalogStore';
 import { validateEmail, validatePhone, validatePickupDate } from '../../utils/validators';
 
 import Step1_SizeSelection from './Step1_SizeSelection';
@@ -24,11 +25,31 @@ const STEP_LABELS = [
 const OrderFormWizard: React.FC = () => {
   const { currentStep, formData, submittedOrder, nextStep, prevStep, setStep, setError, error } =
     useOrderFormStore();
+  const { error: catalogError, sizes, fetchCatalog } = useCatalogStore();
 
   if (submittedOrder) {
     return (
       <div className="card">
         <OrderConfirmation />
+      </div>
+    );
+  }
+
+  // Defensive fallback: if the catalog failed to load (API down/offline),
+  // don't strand the customer on an empty grid with no explanation.
+  if (catalogError && sizes.length === 0) {
+    return (
+      <div className="card text-center py-12" role="alert" aria-live="assertive">
+        <div className="text-5xl mb-4">🧁</div>
+        <h2 className="text-xl font-bold mb-2">We couldn't load the cake menu</h2>
+        <p className="text-gray-600 mb-6">{catalogError}. Please check your connection and try again.</p>
+        <button
+          type="button"
+          onClick={() => fetchCatalog()}
+          className="btn-primary"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -114,7 +135,10 @@ const OrderFormWizard: React.FC = () => {
               key={step}
               type="button"
               onClick={() => step < currentStep && setStep(step)}
-              className="flex flex-col items-center gap-1 flex-1 min-w-[60px]"
+              disabled={step > currentStep}
+              aria-current={isActive ? 'step' : undefined}
+              aria-label={`Step ${step}: ${label}${isDone ? ' (completed)' : isActive ? ' (current)' : ''}`}
+              className="flex flex-col items-center gap-1 flex-1 min-w-[60px] disabled:cursor-default rounded-lg py-1"
             >
               <div
                 className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-all ${
@@ -141,7 +165,9 @@ const OrderFormWizard: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-6">{error}</div>
+        <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mt-6">
+          {error}
+        </div>
       )}
 
       {/* Navigation buttons (hidden on payment step, which has its own CTA) */}

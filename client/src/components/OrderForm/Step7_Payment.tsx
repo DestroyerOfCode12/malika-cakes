@@ -50,7 +50,7 @@ const Step7_Payment: React.FC = () => {
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-2">Payment</h3>
+      <h2 className="text-xl font-bold mb-2">Payment</h2>
       <p className="text-gray-600 mb-6">Secure your order by arranging payment.</p>
 
       <div className="p-6 bg-pink-light rounded-2xl text-center mb-6">

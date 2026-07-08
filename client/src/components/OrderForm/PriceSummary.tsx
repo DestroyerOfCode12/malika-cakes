@@ -12,7 +12,7 @@ const PriceSummary: React.FC = () => {
 
   return (
     <div className="card sticky top-4">
-      <h3 className="brand-logo text-2xl mb-4">Your Order</h3>
+      <h2 className="brand-logo text-2xl mb-4">Your Order</h2>
 
       {(size || flavor) && (
         <div className="mb-4 pb-4 border-b text-sm space-y-1">

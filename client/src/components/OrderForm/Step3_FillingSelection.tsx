@@ -2,18 +2,25 @@ import React from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { useCatalogStore } from '../../store/catalogStore';
 import { formatPrice } from '../../utils/formatters';
+import { CardGridSkeleton } from '../Skeleton';
 
 const Step3_FillingSelection: React.FC = () => {
   const { formData, setFilling } = useOrderFormStore();
   const { fillings, loading } = useCatalogStore();
 
   if (loading) {
-    return <p className="text-center text-gray-500 py-8">Loading fillings...</p>;
+    return (
+      <div>
+        <h2 className="text-xl font-bold mb-2">Choose Your Filling</h2>
+        <p className="text-gray-600 mb-6">This applies to all layers of your cake.</p>
+        <CardGridSkeleton count={5} cols="grid-cols-1" />
+      </div>
+    );
   }
 
   return (
     <div>
-      <h3 className="text-xl font-bold mb-2">Choose Your Filling</h3>
+      <h2 className="text-xl font-bold mb-2">Choose Your Filling</h2>
       <p className="text-gray-600 mb-6">This applies to all layers of your cake.</p>
 
       <div className="space-y-3">

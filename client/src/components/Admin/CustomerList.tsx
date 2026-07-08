@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminService, CustomerWithStats } from '../../services/adminService';
 import { formatPrice, formatDate } from '../../utils/formatters';
+import { TableRowsSkeleton } from '../Skeleton';
 
 const CustomerList: React.FC = () => {
   const [customers, setCustomers] = useState<CustomerWithStats[]>([]);
@@ -22,12 +23,20 @@ const CustomerList: React.FC = () => {
     return c.name.toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q);
   });
 
-  if (loading) return <p className="text-center text-gray-500 py-8">Loading customers...</p>;
-  if (error) return <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">{error}</div>;
+  if (loading) return <TableRowsSkeleton rows={5} />;
+  if (error) {
+    return (
+      <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div>
+      <label htmlFor="customer-search" className="sr-only">Search customers</label>
       <input
+        id="customer-search"
         type="text"
         className="input-base max-w-xs mb-4"
         placeholder="Search by name or email..."
