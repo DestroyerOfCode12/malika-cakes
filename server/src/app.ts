@@ -15,11 +15,22 @@ import { requestLogger } from './middleware/logging';
 const app = express();
 const prisma = new PrismaClient();
 
-// Middleware
+// Allowed origins: comma-separated in CORS_ORIGIN (e.g. your Netlify URL +
+// a custom domain). Falls back to localhost for dev when unset.
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim());
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? 'https://malikacakes.co.za'
-    : 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow same-origin/non-browser requests (no Origin header) and any
+    // configured origin.
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
 }));
 

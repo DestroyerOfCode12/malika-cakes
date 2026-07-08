@@ -1,8 +1,8 @@
 // Malika's Cake Boutique Prisma Schema
-// Dev uses SQLite (zero-install). For production Postgres, switch the
-// provider to "postgresql" and restore Decimal types for money fields.
+// Production datasource: PostgreSQL. Point DATABASE_URL at any hosted
+// Postgres (Neon, Supabase, Railway, Render all work) — see DEPLOYMENT.md.
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -25,7 +25,7 @@ model Customer {
 model CatalogSize {
   id          String   @id @default(uuid())
   name        String   @unique
-  basePrice   Float    @map("base_price")
+  basePrice   Decimal  @map("base_price") @db.Decimal(8, 2)
   servingsMin Int?     @map("servings_min")
   servingsMax Int?     @map("servings_max")
   description String?
@@ -54,7 +54,7 @@ model CatalogFlavor {
 model CatalogFilling {
   id         String   @id @default(uuid())
   name       String   @unique
-  priceAddon Float    @map("price_addon")
+  priceAddon Decimal  @map("price_addon") @db.Decimal(8, 2)
   isActive   Boolean  @default(true) @map("is_active")
   orders     Order[]
   createdAt  DateTime @default(now()) @map("created_at")
@@ -66,7 +66,7 @@ model CatalogFilling {
 model CatalogTopper {
   id                  String               @id @default(uuid())
   name                String               @unique
-  priceAddon          Float                @map("price_addon")
+  priceAddon          Decimal              @map("price_addon") @db.Decimal(8, 2)
   imageUrl            String?              @map("image_url")
   isActive            Boolean              @default(true) @map("is_active")
   orderCustomizations OrderCustomization[]
@@ -77,28 +77,28 @@ model CatalogTopper {
 }
 
 model Order {
-  id          String        @id @default(uuid())
-  customerId  String        @map("customer_id")
-  customer    Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  orderNumber String        @unique @map("order_number")
-  sizeId      String        @map("size_id")
-  size        CatalogSize   @relation(fields: [sizeId], references: [id])
-  flavorId    String        @map("flavor_id")
-  flavor      CatalogFlavor @relation(fields: [flavorId], references: [id])
-  fillingId   String        @map("filling_id")
+  id          String         @id @default(uuid())
+  customerId  String         @map("customer_id")
+  customer    Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderNumber String         @unique @map("order_number")
+  sizeId      String         @map("size_id")
+  size        CatalogSize    @relation(fields: [sizeId], references: [id])
+  flavorId    String         @map("flavor_id")
+  flavor      CatalogFlavor  @relation(fields: [flavorId], references: [id])
+  fillingId   String         @map("filling_id")
   filling     CatalogFilling @relation(fields: [fillingId], references: [id])
 
   // Pricing
-  basePrice          Float @map("base_price")
-  customizationTotal Float @default(0) @map("customization_total")
-  tax                Float @default(0)
-  totalPrice         Float @map("total_price")
+  basePrice          Decimal @map("base_price") @db.Decimal(8, 2)
+  customizationTotal Decimal @default(0) @map("customization_total") @db.Decimal(8, 2)
+  tax                Decimal @default(0) @db.Decimal(8, 2)
+  totalPrice         Decimal @map("total_price") @db.Decimal(8, 2)
 
-  // Dates & Times (pickupTime stored as "HH:mm" string)
+  // Dates & Times
   orderDate      DateTime @default(now()) @map("order_date")
-  pickupDate     DateTime @map("pickup_date")
-  pickupTime     String   @default("12:00") @map("pickup_time")
-  paymentDueDate DateTime @map("payment_due_date")
+  pickupDate     DateTime @map("pickup_date") @db.Date
+  pickupTime     DateTime @default(dbgenerated("'12:00:00'::time")) @map("pickup_time") @db.Time
+  paymentDueDate DateTime @map("payment_due_date") @db.Date
 
   // Status: draft | confirmed | paid | in_progress | ready | picked_up | cancelled
   status        String @default("draft")
@@ -129,7 +129,7 @@ model OrderCustomization {
   topperId    String        @map("topper_id")
   topper      CatalogTopper @relation(fields: [topperId], references: [id])
   quantity    Int           @default(1)
-  priceAtTime Float         @map("price_at_time")
+  priceAtTime Decimal       @map("price_at_time") @db.Decimal(8, 2)
   createdAt   DateTime      @default(now()) @map("created_at")
 
   @@index([orderId])
@@ -154,8 +154,8 @@ model AuditLog {
   entityType String?  @map("entity_type")
   entityId   String?  @map("entity_id")
   action     String?
-  oldValues  String?  @map("old_values")
-  newValues  String?  @map("new_values")
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
   userId     String?  @map("user_id")
   timestamp  DateTime @default(now())
 

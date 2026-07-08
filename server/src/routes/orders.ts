@@ -8,8 +8,9 @@ import {
   calculatePaymentDueDate,
   calculateRefund,
 } from '../utils/validation';
-import { calculateOrderPrice, calculateToppersPrice } from '../utils/pricing';
+import { calculateOrderPrice, calculateToppersPrice, parsePickupTime, formatPickupTime } from '../utils/pricing';
 import { emailService } from '../services/emailService';
+import { serializeOrder } from '../utils/serialize';
 
 const router = Router();
 
@@ -110,7 +111,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         tax: pricing.tax,
         totalPrice: pricing.total,
         pickupDate,
-        pickupTime,
+        pickupTime: parsePickupTime(pickupTime),
         paymentDueDate,
         allergiesRestrictions: dto.allergiesRestrictions,
         specialRequests: dto.specialRequests,
@@ -148,15 +149,15 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       topperNames: order.customizations.map((c) => c.topper.name),
       allergies: order.allergiesRestrictions,
       specialRequests: order.specialRequests,
-      totalPrice: order.totalPrice,
+      totalPrice: Number(order.totalPrice),
       pickupDate: order.pickupDate,
-      pickupTime: order.pickupTime,
+      pickupTime: formatPickupTime(order.pickupTime),
       paymentDueDate: order.paymentDueDate,
     });
 
     res.status(201).json({
       message: 'Order created successfully',
-      data: order,
+      data: serializeOrder(order),
     });
   } catch (err) {
     next(err);
@@ -192,7 +193,7 @@ router.get('/lookup', async (req: Request, res: Response, next: NextFunction) =>
       throw new ApiError(404, 'No order found matching that order number and email');
     }
 
-    res.json({ data: order });
+    res.json({ data: serializeOrder(order) });
   } catch (err) {
     next(err);
   }
@@ -222,7 +223,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       throw new ApiError(404, 'Order not found');
     }
 
-    res.json({ data: order });
+    res.json({ data: serializeOrder(order) });
   } catch (err) {
     next(err);
   }
@@ -264,7 +265,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
       updateData.pickupDate = new Date(dto.pickupDate);
       updateData.paymentDueDate = calculatePaymentDueDate(dto.pickupDate);
     }
-    if (dto.pickupTime) updateData.pickupTime = dto.pickupTime;
+    if (dto.pickupTime) updateData.pickupTime = parsePickupTime(dto.pickupTime);
     if (dto.allergiesRestrictions !== undefined) updateData.allergiesRestrictions = dto.allergiesRestrictions;
     if (dto.specialRequests !== undefined) updateData.specialRequests = dto.specialRequests;
 
@@ -326,7 +327,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
       },
     });
 
-    res.json({ data: updatedOrder });
+    res.json({ data: serializeOrder(updatedOrder) });
   } catch (err) {
     next(err);
   }
@@ -373,7 +374,7 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
     });
 
     res.json({
-      data: updatedOrder,
+      data: serializeOrder(updatedOrder),
       refund: {
         amount: refund.amount,
         percentage: refund.percentage,
