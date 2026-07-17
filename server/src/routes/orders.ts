@@ -89,6 +89,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       if (!dto.deliveryAddress || dto.deliveryAddress.trim().length < 5) {
         throw new ApiError(400, 'A valid delivery address is required');
       }
+      if (typeof dto.deliveryLatitude !== 'number' || typeof dto.deliveryLongitude !== 'number') {
+        throw new ApiError(400, 'Please select an address from the suggestions list');
+      }
       if (typeof dto.deliveryFee !== 'number' || dto.deliveryFee < 0) {
         throw new ApiError(400, 'Missing delivery quote — please re-enter your delivery address');
       }
@@ -142,6 +145,8 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         paymentStatus: 'unpaid',
         deliveryMethod,
         deliveryAddress: deliveryMethod === 'delivery' ? dto.deliveryAddress!.trim() : null,
+        deliveryLatitude: deliveryMethod === 'delivery' ? dto.deliveryLatitude : null,
+        deliveryLongitude: deliveryMethod === 'delivery' ? dto.deliveryLongitude : null,
         deliveryFee,
         // Create order customizations
         customizations: {

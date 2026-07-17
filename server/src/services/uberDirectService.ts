@@ -21,6 +21,10 @@ const WEBHOOK_SECRET = process.env.UBER_DIRECT_WEBHOOK_SECRET || '';
 const STORE_NAME = process.env.STORE_NAME || "Malika's Cake Boutique";
 const STORE_ADDRESS = process.env.STORE_ADDRESS || '';
 const STORE_PHONE = process.env.STORE_PHONE || '';
+// Optional — if set, sent alongside STORE_ADDRESS so Uber doesn't have to
+// geocode the store's own address independently either.
+const STORE_LATITUDE = process.env.STORE_LATITUDE ? Number(process.env.STORE_LATITUDE) : undefined;
+const STORE_LONGITUDE = process.env.STORE_LONGITUDE ? Number(process.env.STORE_LONGITUDE) : undefined;
 
 export const isUberDirectConfigured = () =>
   Boolean(CUSTOMER_ID && CLIENT_ID && CLIENT_SECRET && STORE_ADDRESS && STORE_PHONE);
@@ -81,17 +85,32 @@ interface DeliveryQuote {
   expiresAt: string;
 }
 
+interface DropoffLocation {
+  address: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 /**
  * Get a delivery price + ETA quote for the store -> customer address.
  * Quotes expire (Uber typically gives ~30 min), so this is called live
  * as the customer enters their address, not cached long-term.
+ *
+ * When latitude/longitude are provided (from a Google Places selection),
+ * they're sent alongside the address string — Uber uses them directly
+ * rather than re-geocoding text it didn't resolve itself, which is more
+ * reliable for addresses like apartment complexes and estates.
  */
-export const getDeliveryQuote = async (dropoffAddress: string): Promise<DeliveryQuote> => {
+export const getDeliveryQuote = async (dropoff: DropoffLocation): Promise<DeliveryQuote> => {
   const data = (await authedFetch(`/customers/${CUSTOMER_ID}/delivery_quotes`, {
     method: 'POST',
     body: JSON.stringify({
       pickup_address: STORE_ADDRESS,
-      dropoff_address: dropoffAddress,
+      ...(STORE_LATITUDE !== undefined && { pickup_latitude: STORE_LATITUDE }),
+      ...(STORE_LONGITUDE !== undefined && { pickup_longitude: STORE_LONGITUDE }),
+      dropoff_address: dropoff.address,
+      ...(dropoff.latitude !== undefined && { dropoff_latitude: dropoff.latitude }),
+      ...(dropoff.longitude !== undefined && { dropoff_longitude: dropoff.longitude }),
     }),
   })) as { id: string; fee: number; dropoff_eta: string; expires: string };
 

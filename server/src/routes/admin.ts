@@ -164,7 +164,11 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
         deliveryDispatchError = 'Delivery is not configured — dispatch the courier manually.';
       } else {
         try {
-          const quote = await getDeliveryQuote(updatedOrder.deliveryAddress);
+          const quote = await getDeliveryQuote({
+            address: updatedOrder.deliveryAddress,
+            latitude: updatedOrder.deliveryLatitude ? Number(updatedOrder.deliveryLatitude) : undefined,
+            longitude: updatedOrder.deliveryLongitude ? Number(updatedOrder.deliveryLongitude) : undefined,
+          });
           const delivery = await createDelivery({
             quoteId: quote.quoteId,
             orderNumber: updatedOrder.orderNumber,
