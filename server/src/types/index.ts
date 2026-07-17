@@ -26,6 +26,11 @@ export interface CreateOrderDTO {
   phone: string;
   deliveryMethod?: 'pickup' | 'delivery';
   deliveryAddress?: string;
+  // From the Google Places selection that produced deliveryAddress —
+  // persisted so the admin's later "mark ready" re-quote can hand Uber
+  // exact coordinates instead of re-parsing the address string.
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
   // The estimate shown to the customer from POST /delivery/quote. Uber
   // quotes are only valid ~30 minutes, so a fresh quote is re-fetched
   // right before actually dispatching the courier (see admin status

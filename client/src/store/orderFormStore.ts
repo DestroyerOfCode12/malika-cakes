@@ -19,6 +19,8 @@ interface OrderFormState {
     specialRequests: string;
     deliveryMethod: 'pickup' | 'delivery';
     deliveryAddress: string;
+    deliveryLatitude: number | null;
+    deliveryLongitude: number | null;
   };
   pricing: {
     basePrice: number;
@@ -50,7 +52,7 @@ interface OrderFormState {
   addTopper: (topperId: string, price: number) => void;
   removeTopper: (topperId: string, price: number) => void;
   setDeliveryMethod: (method: 'pickup' | 'delivery') => void;
-  setDeliveryQuote: (address: string, feeRands: number, eta: string) => void;
+  setDeliveryQuote: (address: string, latitude: number, longitude: number, feeRands: number, eta: string) => void;
   clearDeliveryQuote: () => void;
   setSubmittedOrder: (order: OrderFormState['submittedOrder']) => void;
   setError: (error: string | null) => void;
@@ -71,6 +73,8 @@ const initialFormData: OrderFormState['formData'] = {
   specialRequests: '',
   deliveryMethod: 'pickup',
   deliveryAddress: '',
+  deliveryLatitude: null,
+  deliveryLongitude: null,
 };
 
 const initialPricing: OrderFormState['pricing'] = {
@@ -196,7 +200,11 @@ export const useOrderFormStore = create<OrderFormState>()(
 
       setDeliveryMethod: (method: 'pickup' | 'delivery') => {
         set((state) => ({
-          formData: { ...state.formData, deliveryMethod: method, ...(method === 'pickup' && { deliveryAddress: '' }) },
+          formData: {
+            ...state.formData,
+            deliveryMethod: method,
+            ...(method === 'pickup' && { deliveryAddress: '', deliveryLatitude: null, deliveryLongitude: null }),
+          },
           pricing:
             method === 'pickup'
               ? recalculate(state.pricing.basePrice, state.pricing.fillingPrice, state.pricing.toppersPrice, 0, '')
@@ -204,9 +212,9 @@ export const useOrderFormStore = create<OrderFormState>()(
         }));
       },
 
-      setDeliveryQuote: (address: string, feeRands: number, eta: string) => {
+      setDeliveryQuote: (address: string, latitude: number, longitude: number, feeRands: number, eta: string) => {
         set((state) => ({
-          formData: { ...state.formData, deliveryAddress: address },
+          formData: { ...state.formData, deliveryAddress: address, deliveryLatitude: latitude, deliveryLongitude: longitude },
           pricing: recalculate(
             state.pricing.basePrice,
             state.pricing.fillingPrice,
@@ -219,6 +227,7 @@ export const useOrderFormStore = create<OrderFormState>()(
 
       clearDeliveryQuote: () => {
         set((state) => ({
+          formData: { ...state.formData, deliveryAddress: '', deliveryLatitude: null, deliveryLongitude: null },
           pricing: recalculate(
             state.pricing.basePrice,
             state.pricing.fillingPrice,

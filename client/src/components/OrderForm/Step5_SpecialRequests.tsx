@@ -1,52 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { getMinPickupDate, validatePickupDate } from '../../utils/validators';
 import { deliveryService } from '../../services/deliveryService';
 import { formatPrice } from '../../utils/formatters';
+import AddressAutocomplete from './AddressAutocomplete';
 
 const Step5_SpecialRequests: React.FC = () => {
   const { formData, pricing, updateFormData, setDeliveryMethod, setDeliveryQuote, clearDeliveryQuote } =
     useOrderFormStore();
   const minDate = getMinPickupDate();
 
-  const [addressInput, setAddressInput] = useState(formData.deliveryAddress);
   const [quoting, setQuoting] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
 
   const pickupDateInvalid = formData.pickupDate.length > 0 && !validatePickupDate(formData.pickupDate);
 
-  // Debounced live quote as the customer types their delivery address —
-  // same spirit as the real-time pricing for toppers/fillings.
-  useEffect(() => {
-    if (formData.deliveryMethod !== 'delivery') return;
-    if (addressInput.trim().length < 5) {
+  const handleAddressSelect = async (result: { address: string; latitude: number; longitude: number }) => {
+    setQuoting(true);
+    setQuoteError(null);
+    try {
+      const quote = await deliveryService.getQuote(result.address, result.latitude, result.longitude);
+      setDeliveryQuote(result.address, result.latitude, result.longitude, quote.feeRands, quote.dropoffEta);
+    } catch (err: any) {
       clearDeliveryQuote();
-      setQuoteError(null);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setQuoting(true);
-      setQuoteError(null);
-      try {
-        const quote = await deliveryService.getQuote(addressInput.trim());
-        setDeliveryQuote(addressInput.trim(), quote.feeRands, quote.dropoffEta);
-      } catch (err: any) {
-        clearDeliveryQuote();
-        if (err?.response?.status === 503) {
-          setQuoteError("Delivery isn't available yet — please choose pickup for now.");
-        } else {
-          setQuoteError(err?.response?.data?.error || "Couldn't get a delivery quote for that address.");
-        }
-      } finally {
-        setQuoting(false);
+      if (err?.response?.status === 503) {
+        setQuoteError("Delivery isn't available yet — please choose pickup for now.");
+      } else {
+        setQuoteError(err?.response?.data?.error || "Couldn't get a delivery quote for that address.");
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, 600);
+    } finally {
+      setQuoting(false);
+    }
+  };
 
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressInput, formData.deliveryMethod]);
+  const handleAddressClear = () => {
+    clearDeliveryQuote();
+    setQuoteError(null);
+  };
 
   return (
     <div>
@@ -221,17 +211,13 @@ const Step5_SpecialRequests: React.FC = () => {
               <label htmlFor="delivery-address" className="block text-sm font-medium mb-2">
                 Delivery Address *
               </label>
-              <textarea
-                id="delivery-address"
-                className="input-base"
-                rows={2}
-                placeholder="Street address, suburb, city..."
-                value={addressInput}
-                onChange={(e) => setAddressInput(e.target.value)}
-                aria-describedby="delivery-quote-status"
-                required
+              <AddressAutocomplete
+                value={formData.deliveryAddress}
+                onSelect={handleAddressSelect}
+                onClear={handleAddressClear}
+                disabled={quoting}
               />
-              <div id="delivery-quote-status" className="mt-2 text-sm" aria-live="polite">
+              <div className="mt-2 text-sm" aria-live="polite">
                 {quoting && <p className="text-gray-500">Getting delivery quote...</p>}
                 {!quoting && quoteError && <p className="text-red-600">{quoteError}</p>}
                 {!quoting && !quoteError && pricing.deliveryFee > 0 && (

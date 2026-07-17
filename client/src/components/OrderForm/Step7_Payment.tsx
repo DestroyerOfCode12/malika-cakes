@@ -33,6 +33,9 @@ const Step7_Payment: React.FC = () => {
         phone: formData.phone,
         deliveryMethod: formData.deliveryMethod,
         deliveryAddress: formData.deliveryMethod === 'delivery' ? formData.deliveryAddress : undefined,
+        deliveryLatitude: formData.deliveryMethod === 'delivery' ? formData.deliveryLatitude ?? undefined : undefined,
+        deliveryLongitude:
+          formData.deliveryMethod === 'delivery' ? formData.deliveryLongitude ?? undefined : undefined,
         deliveryFee: formData.deliveryMethod === 'delivery' ? pricing.deliveryFee : undefined,
       });
 

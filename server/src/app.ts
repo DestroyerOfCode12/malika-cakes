@@ -9,6 +9,7 @@ import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import paymentsRoutes from './routes/payments';
 import deliveryRoutes from './routes/delivery';
+import placesRoutes from './routes/places';
 
 // Middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -53,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/delivery', deliveryRoutes);
+app.use('/api/places', placesRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

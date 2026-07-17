@@ -7,8 +7,10 @@ const router = Router();
 
 /**
  * POST /delivery/quote - Live price + ETA quote for a dropoff address.
- * Called as the customer types their delivery address in the order form,
- * same spirit as the real-time pricing for toppers/fillings.
+ * Called once the customer picks a suggestion from the Google Places
+ * autocomplete — address, latitude, and longitude all come from that
+ * selection, not freeform typed text, so Uber gets an exact location
+ * rather than something it has to guess-geocode itself.
  */
 router.post('/quote', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,12 +18,20 @@ router.post('/quote', async (req: Request, res: Response, next: NextFunction) =>
       throw new ApiError(503, 'Delivery is not available yet — pickup only for now.');
     }
 
-    const { address } = req.body as { address?: string };
+    const { address, latitude, longitude } = req.body as {
+      address?: string;
+      latitude?: number;
+      longitude?: number;
+    };
+
     if (!address || address.trim().length < 5) {
       throw new ApiError(400, 'A valid delivery address is required');
     }
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+      throw new ApiError(400, 'Please select an address from the suggestions list');
+    }
 
-    const quote = await getDeliveryQuote(address.trim());
+    const quote = await getDeliveryQuote({ address: address.trim(), latitude, longitude });
     res.json({ data: quote });
   } catch (err) {
     next(err);

@@ -115,6 +115,11 @@ model Order {
   // | pickup | pickup_complete | dropoff | delivered | canceled
   deliveryMethod    String   @default("pickup") @map("delivery_method")
   deliveryAddress   String?  @map("delivery_address")
+  // From Google Places — precise coordinates, so the admin's later "mark
+  // ready" re-quote can hand Uber exact lat/lng instead of re-parsing a
+  // string (Uber trusts these directly with no independent double-check).
+  deliveryLatitude  Decimal? @map("delivery_latitude") @db.Decimal(10, 7)
+  deliveryLongitude Decimal? @map("delivery_longitude") @db.Decimal(10, 7)
   deliveryFee       Decimal  @default(0) @map("delivery_fee") @db.Decimal(8, 2)
   deliveryStatus    String?  @map("delivery_status")
   uberDeliveryId    String?  @map("uber_delivery_id")

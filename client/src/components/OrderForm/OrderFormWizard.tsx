@@ -81,8 +81,8 @@ const OrderFormWizard: React.FC = () => {
           return 'Pickup date must be at least 14 days from today.';
         }
         if (formData.deliveryMethod === 'delivery') {
-          if (!formData.deliveryAddress) {
-            return 'Please enter a delivery address.';
+          if (!formData.deliveryAddress || formData.deliveryLatitude === null || formData.deliveryLongitude === null) {
+            return 'Please select a delivery address from the suggestions list.';
           }
           if (pricing.deliveryFee <= 0) {
             return 'Please wait for a delivery quote before continuing.';

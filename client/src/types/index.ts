@@ -105,6 +105,8 @@ export interface CreateOrderRequest {
   phone: string;
   deliveryMethod?: 'pickup' | 'delivery';
   deliveryAddress?: string;
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
   deliveryFee?: number;
 }
 
@@ -114,6 +116,18 @@ export interface DeliveryQuote {
   feeRands: number;
   dropoffEta: string;
   expiresAt: string;
+}
+
+// Places (Google Places autocomplete)
+export interface PlaceSuggestion {
+  placeId: string;
+  text: string;
+}
+
+export interface PlaceDetails {
+  formattedAddress: string;
+  latitude: number;
+  longitude: number;
 }
 
 // Auth
