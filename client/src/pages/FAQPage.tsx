@@ -33,7 +33,7 @@ const FAQPage: React.FC = () => {
             },
             {
               q: 'Do you offer delivery?',
-              a: 'Currently, we offer pickup only. Delivery options coming soon!',
+              a: "You're welcome to collect from us at pickup. We're rolling out delivery via Uber Direct — if it's available for your address, you'll see a live quote at checkout.",
             },
             {
               q: 'Can you accommodate dietary restrictions?',

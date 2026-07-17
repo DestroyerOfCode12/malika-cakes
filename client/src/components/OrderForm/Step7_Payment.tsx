@@ -31,6 +31,9 @@ const Step7_Payment: React.FC = () => {
         specialRequests: formData.specialRequests,
         email: formData.email,
         phone: formData.phone,
+        deliveryMethod: formData.deliveryMethod,
+        deliveryAddress: formData.deliveryMethod === 'delivery' ? formData.deliveryAddress : undefined,
+        deliveryFee: formData.deliveryMethod === 'delivery' ? pricing.deliveryFee : undefined,
       });
 
       setSubmittedOrder({
@@ -51,11 +54,14 @@ const Step7_Payment: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-bold mb-2">Payment</h2>
-      <p className="text-gray-600 mb-6">Secure your order by arranging payment.</p>
+      <p className="text-gray-600 mb-6">Confirm your order, then pay securely on the next screen.</p>
 
       <div className="p-6 bg-pink-light rounded-2xl text-center mb-6">
         <p className="text-sm text-gray-600 mb-1">Total Amount Due</p>
-        <p className="text-4xl font-bold text-pink">{formatPrice(pricing.total)}</p>
+        <p className="text-4xl font-bold text-pink">{formatPrice(pricing.grandTotal)}</p>
+        {formData.deliveryMethod === 'delivery' && pricing.deliveryFee > 0 && (
+          <p className="text-xs text-gray-500 mt-1">Includes {formatPrice(pricing.deliveryFee)} delivery</p>
+        )}
         {paymentDueDate && (
           <p className="text-sm text-gray-600 mt-2">
             Payment due by <strong>{formatDate(paymentDueDate)}</strong>
@@ -63,24 +69,18 @@ const Step7_Payment: React.FC = () => {
         )}
       </div>
 
-      <div className="space-y-3 mb-6">
-        <button
-          type="button"
-          disabled
-          className="w-full py-3 rounded-lg font-medium bg-gray-200 text-gray-500 cursor-not-allowed"
-          title="Coming soon — PayFast integration in Phase 2"
-        >
-          🔒 Secure Payment (Coming Soon)
-        </button>
-
-        <div className="p-4 border border-gray-200 rounded-lg text-sm text-gray-600">
-          <p className="font-medium mb-1">Manual Payment Instructions</p>
-          <p>Once your order is confirmed, contact us via WhatsApp or email to arrange EFT payment. We'll send banking details and a reminder before your payment deadline.</p>
-        </div>
+      <div className="p-4 border border-gray-200 rounded-lg text-sm text-gray-600 mb-6">
+        <p className="font-medium mb-1">How payment works</p>
+        <p>
+          Once you confirm, you'll get the option to pay securely online with PayFast, or arrange
+          payment with us directly via WhatsApp or email before your deadline.
+        </p>
       </div>
 
       {error && (
-        <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4">{error}</div>
+        <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4">
+          {error}
+        </div>
       )}
 
       <button
@@ -89,7 +89,7 @@ const Step7_Payment: React.FC = () => {
         disabled={submitting}
         className="btn-primary w-full"
       >
-        {submitting ? 'Submitting Order...' : 'Confirm Order (Arrange Payment Later)'}
+        {submitting ? 'Submitting Order...' : 'Confirm Order'}
       </button>
     </div>
   );

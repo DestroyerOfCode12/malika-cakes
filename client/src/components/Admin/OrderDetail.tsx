@@ -33,8 +33,11 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) 
     setSaving(true);
     setError(null);
     try {
-      const updated = await adminService.updateOrderStatus(order.id, status);
+      const { order: updated, deliveryDispatchError } = await adminService.updateOrderStatus(order.id, status);
       onUpdated(updated);
+      if (deliveryDispatchError) {
+        setError(deliveryDispatchError);
+      }
     } catch (err: any) {
       setError(err?.response?.data?.error || 'Failed to update status');
     } finally {
@@ -104,7 +107,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) 
           </div>
 
           <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-sm text-gray-500 mb-1">Pickup</p>
+            <p className="text-sm text-gray-500 mb-1">{order.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}</p>
             <p className="font-bold">{formatDate(order.pickupDate)}</p>
             <p className="text-sm text-gray-600">at {order.pickupTime}</p>
             <p className="text-sm text-gray-600 mt-1">
@@ -112,6 +115,29 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, onClose, onUpdated }) 
             </p>
           </div>
         </div>
+
+        {order.deliveryMethod === 'delivery' && (
+          <div className="bg-gray-50 rounded-xl p-4 mb-4">
+            <p className="text-sm text-gray-500 mb-1">Delivery Address</p>
+            <p className="font-bold">{order.deliveryAddress}</p>
+            <p className="text-sm text-gray-600 mt-1">Delivery fee: {formatPrice(order.deliveryFee)}</p>
+            {order.deliveryStatus && (
+              <p className="text-sm text-gray-600 mt-1">
+                Courier status: <span className="font-medium">{order.deliveryStatus.replace(/_/g, ' ')}</span>
+              </p>
+            )}
+            {order.uberTrackingUrl && (
+              <a
+                href={order.uberTrackingUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-pink hover:underline font-medium mt-1 inline-block"
+              >
+                View live tracking →
+              </a>
+            )}
+          </div>
+        )}
 
         <div className="bg-pink-light rounded-xl p-4 mb-4">
           <p className="text-sm text-gray-500 mb-2">Cake</p>

@@ -23,7 +23,7 @@ const STEP_LABELS = [
 ];
 
 const OrderFormWizard: React.FC = () => {
-  const { currentStep, formData, submittedOrder, nextStep, prevStep, setStep, setError, error } =
+  const { currentStep, formData, pricing, submittedOrder, nextStep, prevStep, setStep, setError, error } =
     useOrderFormStore();
   const { error: catalogError, sizes, fetchCatalog } = useCatalogStore();
 
@@ -79,6 +79,14 @@ const OrderFormWizard: React.FC = () => {
         }
         if (!validatePickupDate(formData.pickupDate)) {
           return 'Pickup date must be at least 14 days from today.';
+        }
+        if (formData.deliveryMethod === 'delivery') {
+          if (!formData.deliveryAddress) {
+            return 'Please enter a delivery address.';
+          }
+          if (pricing.deliveryFee <= 0) {
+            return 'Please wait for a delivery quote before continuing.';
+          }
         }
         return null;
       default:

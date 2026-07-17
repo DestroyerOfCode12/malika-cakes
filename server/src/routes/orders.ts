@@ -12,6 +12,7 @@ import { calculateOrderPrice, calculateToppersPrice, parsePickupTime, formatPick
 import { emailService } from '../services/emailService';
 import { serializeOrder } from '../utils/serialize';
 import { buildPayfastPaymentFields, isPayfastConfigured } from '../services/paymentService';
+import { isUberDirectConfigured } from '../services/uberDirectService';
 
 const router = Router();
 
@@ -76,6 +77,26 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     const toppersPrice = calculateToppersPrice(toppers.map(t => Number(t.priceAddon)));
     const pricing = calculateOrderPrice(Number(size.basePrice), fillingPrice, toppersPrice);
 
+    // Delivery (Uber Direct) — a pass-through courier fee, added after
+    // VAT rather than folded into the taxable cake subtotal.
+    const deliveryMethod = dto.deliveryMethod === 'delivery' ? 'delivery' : 'pickup';
+    let deliveryFee = 0;
+
+    if (deliveryMethod === 'delivery') {
+      if (!isUberDirectConfigured()) {
+        throw new ApiError(400, 'Delivery is not available yet — please choose pickup.');
+      }
+      if (!dto.deliveryAddress || dto.deliveryAddress.trim().length < 5) {
+        throw new ApiError(400, 'A valid delivery address is required');
+      }
+      if (typeof dto.deliveryFee !== 'number' || dto.deliveryFee < 0) {
+        throw new ApiError(400, 'Missing delivery quote — please re-enter your delivery address');
+      }
+      deliveryFee = dto.deliveryFee;
+    }
+
+    const totalWithDelivery = Number((pricing.total + deliveryFee).toFixed(2));
+
     // Create or get customer
     let customer = await prisma.customer.findUnique({
       where: { email: dto.email },
@@ -110,7 +131,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         basePrice: pricing.basePrice,
         customizationTotal: pricing.fillingPrice + pricing.toppersPrice,
         tax: pricing.tax,
-        totalPrice: pricing.total,
+        totalPrice: totalWithDelivery,
         pickupDate,
         pickupTime: parsePickupTime(pickupTime),
         paymentDueDate,
@@ -119,6 +140,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         recipientPhone: dto.phone,
         status: 'confirmed',
         paymentStatus: 'unpaid',
+        deliveryMethod,
+        deliveryAddress: deliveryMethod === 'delivery' ? dto.deliveryAddress!.trim() : null,
+        deliveryFee,
         // Create order customizations
         customizations: {
           create: toppers.map(topper => ({

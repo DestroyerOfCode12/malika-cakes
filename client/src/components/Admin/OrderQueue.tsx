@@ -148,7 +148,12 @@ const OrderQueue: React.FC = () => {
                   <td className="py-3 pr-3 text-gray-600">
                     {order.size?.name} · {order.flavor?.name}
                   </td>
-                  <td className="py-3 pr-3">{formatDate(order.pickupDate)}</td>
+                  <td className="py-3 pr-3">
+                    {formatDate(order.pickupDate)}
+                    {order.deliveryMethod === 'delivery' && (
+                      <span className="ml-1" title="Delivery order">🚗</span>
+                    )}
+                  </td>
                   <td className="py-3 pr-3">
                     <span className={`badge-status ${getStatusColor(order.status)}`}>
                       {getStatusLabel(order.status)}

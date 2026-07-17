@@ -41,9 +41,16 @@ export const adminService = {
     return response.data.data;
   },
 
-  async updateOrderStatus(id: string, status: string, notes?: string): Promise<Order> {
-    const response = await apiClient.patch<ApiResponse<Order>>(`/admin/orders/${id}/status`, { status, notes });
-    return response.data.data;
+  async updateOrderStatus(
+    id: string,
+    status: string,
+    notes?: string
+  ): Promise<{ order: Order; deliveryDispatchError?: string }> {
+    const response = await apiClient.patch<ApiResponse<Order> & { deliveryDispatchError?: string }>(
+      `/admin/orders/${id}/status`,
+      { status, notes }
+    );
+    return { order: response.data.data, deliveryDispatchError: response.data.deliveryDispatchError };
   },
 
   async updatePaymentStatus(id: string, paymentStatus: string): Promise<Order> {

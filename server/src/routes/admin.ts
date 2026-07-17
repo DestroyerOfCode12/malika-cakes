@@ -6,6 +6,7 @@ import { AdminDashboardStats } from '../types';
 import { emailService } from '../services/emailService';
 import { serializeOrder, serializeOrders } from '../utils/serialize';
 import { formatPickupTime } from '../utils/pricing';
+import { getDeliveryQuote, createDelivery, isUberDirectConfigured } from '../services/uberDirectService';
 
 const router = Router();
 
@@ -122,7 +123,7 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
       throw new ApiError(404, 'Order not found');
     }
 
-    const updatedOrder = await prisma.order.update({
+    let updatedOrder = await prisma.order.update({
       where: { id },
       data: { status },
       include: {
@@ -148,6 +149,54 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
       },
     });
 
+    // Dispatch an Uber Direct courier the moment a delivery order goes
+    // "ready" — this is the actual commitment point, never earlier. A
+    // fresh quote is required since the one shown to the customer at
+    // checkout has long since expired (Uber quotes last ~30 minutes).
+    let deliveryDispatchError: string | null = null;
+    if (
+      status === 'ready' &&
+      updatedOrder.deliveryMethod === 'delivery' &&
+      !updatedOrder.uberDeliveryId &&
+      updatedOrder.deliveryAddress
+    ) {
+      if (!isUberDirectConfigured()) {
+        deliveryDispatchError = 'Delivery is not configured — dispatch the courier manually.';
+      } else {
+        try {
+          const quote = await getDeliveryQuote(updatedOrder.deliveryAddress);
+          const delivery = await createDelivery({
+            quoteId: quote.quoteId,
+            orderNumber: updatedOrder.orderNumber,
+            dropoffAddress: updatedOrder.deliveryAddress,
+            dropoffName: updatedOrder.customer.name,
+            dropoffPhone: updatedOrder.customer.phone || updatedOrder.recipientPhone || '',
+            itemName: `${updatedOrder.size.name} ${updatedOrder.flavor.name} Cake`,
+          });
+
+          updatedOrder = await prisma.order.update({
+            where: { id },
+            data: {
+              uberDeliveryId: delivery.uberDeliveryId,
+              uberTrackingUrl: delivery.trackingUrl,
+              deliveryStatus: delivery.status,
+            },
+            include: {
+              customer: true,
+              size: true,
+              flavor: true,
+              filling: true,
+              customizations: { include: { topper: true } },
+            },
+          });
+        } catch (dispatchErr) {
+          console.error(`[uber-direct] Failed to dispatch courier for ${updatedOrder.orderNumber}:`, dispatchErr);
+          deliveryDispatchError =
+            'Could not dispatch the courier automatically — please arrange delivery manually.';
+        }
+      }
+    }
+
     // Notify customer when their cake is ready
     if (status === 'ready' && updatedOrder.customer.email) {
       void emailService.sendReadyNotification({
@@ -168,6 +217,7 @@ router.patch('/orders/:id/status', async (req: AuthRequest, res: Response, next:
     res.json({
       message: 'Order status updated',
       data: serializeOrder(updatedOrder),
+      ...(deliveryDispatchError && { deliveryDispatchError }),
     });
   } catch (err) {
     next(err);

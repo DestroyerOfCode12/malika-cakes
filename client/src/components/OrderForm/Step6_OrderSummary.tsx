@@ -71,10 +71,15 @@ const Step6_OrderSummary: React.FC = () => {
 
         <div className="flex justify-between items-start p-4 bg-gray-50 rounded-lg">
           <div>
-            <p className="text-sm text-gray-500">Pickup</p>
+            <p className="text-sm text-gray-500">
+              {formData.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}
+            </p>
             <p className="font-bold">
               {formData.pickupDate ? formatDate(formData.pickupDate) : '—'} at {formData.pickupTime}
             </p>
+            {formData.deliveryMethod === 'delivery' && formData.deliveryAddress && (
+              <p className="text-sm text-gray-600 mt-1">To: {formData.deliveryAddress}</p>
+            )}
             {formData.allergiesRestrictions && (
               <p className="text-sm text-gray-600 mt-1">Allergies: {formData.allergiesRestrictions}</p>
             )}
@@ -114,10 +119,16 @@ const Step6_OrderSummary: React.FC = () => {
             <span>VAT (15%)</span>
             <span>{formatPrice(pricing.tax)}</span>
           </div>
+          {formData.deliveryMethod === 'delivery' && pricing.deliveryFee > 0 && (
+            <div className="flex justify-between text-sm">
+              <span>Delivery</span>
+              <span>{formatPrice(pricing.deliveryFee)}</span>
+            </div>
+          )}
           <hr className="border-pink/30" />
           <div className="flex justify-between font-bold text-lg">
             <span>Total</span>
-            <span className="text-pink">{formatPrice(pricing.total)}</span>
+            <span className="text-pink">{formatPrice(pricing.grandTotal)}</span>
           </div>
         </div>
 

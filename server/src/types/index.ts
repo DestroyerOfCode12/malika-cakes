@@ -24,6 +24,13 @@ export interface CreateOrderDTO {
   specialRequests?: string;
   email: string;
   phone: string;
+  deliveryMethod?: 'pickup' | 'delivery';
+  deliveryAddress?: string;
+  // The estimate shown to the customer from POST /delivery/quote. Uber
+  // quotes are only valid ~30 minutes, so a fresh quote is re-fetched
+  // right before actually dispatching the courier (see admin status
+  // route) — this field is for display/order-total purposes only.
+  deliveryFee?: number;
 }
 
 export interface UpdateOrderDTO {
