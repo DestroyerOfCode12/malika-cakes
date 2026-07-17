@@ -41,7 +41,7 @@ const getAccessToken = async (): Promise<string> => {
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
       grant_type: 'client_credentials',
-      scope: 'eats.deliveries',
+      scope: 'direct.organizations',
     }),
   });
 
