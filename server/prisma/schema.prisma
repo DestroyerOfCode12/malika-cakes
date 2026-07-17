@@ -110,6 +110,16 @@ model Order {
   specialRequests       String? @map("special_requests")
   recipientPhone        String? @map("recipient_phone")
 
+  // Delivery (Uber Direct) — deliveryMethod: pickup | delivery
+  // deliveryStatus mirrors Uber Direct's lifecycle: pending | courier_assigned
+  // | pickup | pickup_complete | dropoff | delivered | canceled
+  deliveryMethod    String   @default("pickup") @map("delivery_method")
+  deliveryAddress   String?  @map("delivery_address")
+  deliveryFee       Decimal  @default(0) @map("delivery_fee") @db.Decimal(8, 2)
+  deliveryStatus    String?  @map("delivery_status")
+  uberDeliveryId    String?  @map("uber_delivery_id")
+  uberTrackingUrl   String?  @map("uber_tracking_url")
+
   customizations OrderCustomization[]
 
   createdAt DateTime @default(now()) @map("created_at")

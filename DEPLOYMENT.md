@@ -59,6 +59,8 @@ postgresql://user:password@host:5432/dbname?sslmode=require
    | `BACKEND_URL` | this backend's own public URL (PayFast's payment-confirmation webhook needs to reach it) |
    | `PAYFAST_MODE` | `sandbox` for testing, `live` to go live |
    | `PAYFAST_MERCHANT_ID` / `PAYFAST_MERCHANT_KEY` / `PAYFAST_PASSPHRASE` | from your PayFast (sandbox or live) merchant account — see **PayFast setup** below. Leave unset and "Pay Now" just returns a clear error instead of breaking, so it's safe to deploy before these are ready. |
+   | `UBER_DIRECT_CUSTOMER_ID` / `UBER_DIRECT_CLIENT_ID` / `UBER_DIRECT_CLIENT_SECRET` / `UBER_DIRECT_WEBHOOK_SECRET` | from your Uber Direct business account — see **Uber Direct setup** below. Leave unset and delivery quotes return a clear error, the order form only offers pickup. |
+   | `STORE_NAME` / `STORE_ADDRESS` / `STORE_PHONE` | your store's own pickup address — Uber Direct needs this to route couriers to you |
 7. Deploy. Once it's live, run the seed script once (Railway/Render both
    let you run one-off commands against the deployed environment):
    ```
@@ -108,6 +110,32 @@ Until these are set, the "Pay Now with PayFast" button on the order
 confirmation screen shows a friendly "not set up yet" message instead of
 breaking — customers can still be told to arrange payment manually via
 the order's contact details in the meantime.
+
+## Uber Direct setup (delivery)
+
+Unlike PayFast, there's no instant free sandbox here — Uber Direct requires
+applying for a real business account (no card/business registration
+needed, but Uber reviews it, which can take some time):
+
+1. Apply at **[direct.uber.com](https://direct.uber.com)**.
+2. Once approved, Uber gives you a **Customer ID**, **Client ID**, and
+   **Client Secret** from the developer dashboard, plus a **webhook
+   signing secret** when you register your webhook URL.
+3. Register your webhook URL as
+   `https://<your-backend-url>/api/delivery/uber-direct/webhook` (delivery
+   status updates — separate from PayFast's payment webhook).
+4. Set `UBER_DIRECT_CUSTOMER_ID`, `UBER_DIRECT_CLIENT_ID`,
+   `UBER_DIRECT_CLIENT_SECRET`, and `UBER_DIRECT_WEBHOOK_SECRET` on your
+   backend host, plus `STORE_NAME`, `STORE_ADDRESS`, and `STORE_PHONE` —
+   your actual pickup location, since that's where Uber routes the
+   courier from.
+5. Delivery dispatch only happens when you mark a delivery order "Ready
+   for Pickup" in the admin — never automatically at order time, since
+   quotes expire (~30 min) long before an order's pickup date arrives. A
+   fresh quote is fetched right before the courier is actually booked.
+
+Until these are set, customers only see the "Pickup" option — "Delivery"
+gracefully returns a clear message instead of a broken quote request.
 
 ## 4. Verify
 

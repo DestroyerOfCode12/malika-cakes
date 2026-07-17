@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { getMinPickupDate, validatePickupDate } from '../../utils/validators';
+import { deliveryService } from '../../services/deliveryService';
+import { formatPrice } from '../../utils/formatters';
 
 const Step5_SpecialRequests: React.FC = () => {
-  const { formData, updateFormData } = useOrderFormStore();
+  const { formData, pricing, updateFormData, setDeliveryMethod, setDeliveryQuote, clearDeliveryQuote } =
+    useOrderFormStore();
   const minDate = getMinPickupDate();
 
+  const [addressInput, setAddressInput] = useState(formData.deliveryAddress);
+  const [quoting, setQuoting] = useState(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+
   const pickupDateInvalid = formData.pickupDate.length > 0 && !validatePickupDate(formData.pickupDate);
+
+  // Debounced live quote as the customer types their delivery address —
+  // same spirit as the real-time pricing for toppers/fillings.
+  useEffect(() => {
+    if (formData.deliveryMethod !== 'delivery') return;
+    if (addressInput.trim().length < 5) {
+      clearDeliveryQuote();
+      setQuoteError(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setQuoting(true);
+      setQuoteError(null);
+      try {
+        const quote = await deliveryService.getQuote(addressInput.trim());
+        setDeliveryQuote(addressInput.trim(), quote.feeRands, quote.dropoffEta);
+      } catch (err: any) {
+        clearDeliveryQuote();
+        if (err?.response?.status === 503) {
+          setQuoteError("Delivery isn't available yet — please choose pickup for now.");
+        } else {
+          setQuoteError(err?.response?.data?.error || "Couldn't get a delivery quote for that address.");
+        }
+      } finally {
+        setQuoting(false);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, 600);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressInput, formData.deliveryMethod]);
 
   return (
     <div>
@@ -42,7 +82,7 @@ const Step5_SpecialRequests: React.FC = () => {
             className="input-base"
             rows={3}
             maxLength={500}
-            placeholder="Describe any custom design ideas or delivery instructions..."
+            placeholder="Describe any custom design ideas..."
             value={formData.specialRequests}
             onChange={(e) => updateFormData({ specialRequests: e.target.value })}
             aria-describedby="requests-count"
@@ -137,8 +177,72 @@ const Step5_SpecialRequests: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600">
-          📍 Delivery option: <strong>Pickup only</strong> (Uber Connect delivery coming Q1 2027)
+        <hr className="divider" />
+
+        <div>
+          <span className="block text-sm font-medium mb-2">Pickup or Delivery?</span>
+          <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Pickup or delivery">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={formData.deliveryMethod === 'pickup'}
+              onClick={() => setDeliveryMethod('pickup')}
+              className={`p-3 rounded-xl border-2 text-center transition-all ${
+                formData.deliveryMethod === 'pickup'
+                  ? 'border-pink bg-pink-light'
+                  : 'border-gray-200 hover:border-pink/50 bg-white'
+              }`}
+            >
+              <span className="font-medium text-sm">📍 Pickup</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={formData.deliveryMethod === 'delivery'}
+              onClick={() => setDeliveryMethod('delivery')}
+              className={`p-3 rounded-xl border-2 text-center transition-all ${
+                formData.deliveryMethod === 'delivery'
+                  ? 'border-pink bg-pink-light'
+                  : 'border-gray-200 hover:border-pink/50 bg-white'
+              }`}
+            >
+              <span className="font-medium text-sm">🚗 Delivery</span>
+            </button>
+          </div>
+
+          {formData.deliveryMethod === 'pickup' && (
+            <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 mt-3">
+              📍 Pickup from our Midrand location — details in your confirmation email.
+            </div>
+          )}
+
+          {formData.deliveryMethod === 'delivery' && (
+            <div className="mt-3">
+              <label htmlFor="delivery-address" className="block text-sm font-medium mb-2">
+                Delivery Address *
+              </label>
+              <textarea
+                id="delivery-address"
+                className="input-base"
+                rows={2}
+                placeholder="Street address, suburb, city..."
+                value={addressInput}
+                onChange={(e) => setAddressInput(e.target.value)}
+                aria-describedby="delivery-quote-status"
+                required
+              />
+              <div id="delivery-quote-status" className="mt-2 text-sm" aria-live="polite">
+                {quoting && <p className="text-gray-500">Getting delivery quote...</p>}
+                {!quoting && quoteError && <p className="text-red-600">{quoteError}</p>}
+                {!quoting && !quoteError && pricing.deliveryFee > 0 && (
+                  <p className="text-pink font-medium">
+                    Delivery: {formatPrice(pricing.deliveryFee)}
+                    {pricing.deliveryEta && ` · Est. ${pricing.deliveryEta}`}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

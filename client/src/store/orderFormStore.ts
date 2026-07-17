@@ -17,6 +17,8 @@ interface OrderFormState {
     pickupTime: string;
     allergiesRestrictions: string;
     specialRequests: string;
+    deliveryMethod: 'pickup' | 'delivery';
+    deliveryAddress: string;
   };
   pricing: {
     basePrice: number;
@@ -24,7 +26,10 @@ interface OrderFormState {
     toppersPrice: number;
     subtotal: number;
     tax: number;
-    total: number;
+    total: number; // cake total (subtotal + tax), excludes delivery
+    deliveryFee: number;
+    deliveryEta: string;
+    grandTotal: number; // total + deliveryFee — the actual amount due
   };
   submittedOrder: {
     id: string;
@@ -44,6 +49,9 @@ interface OrderFormState {
   setFilling: (fillingId: string, price: number) => void;
   addTopper: (topperId: string, price: number) => void;
   removeTopper: (topperId: string, price: number) => void;
+  setDeliveryMethod: (method: 'pickup' | 'delivery') => void;
+  setDeliveryQuote: (address: string, feeRands: number, eta: string) => void;
+  clearDeliveryQuote: () => void;
   setSubmittedOrder: (order: OrderFormState['submittedOrder']) => void;
   setError: (error: string | null) => void;
   resetForm: () => void;
@@ -61,6 +69,8 @@ const initialFormData: OrderFormState['formData'] = {
   pickupTime: '12:00',
   allergiesRestrictions: '',
   specialRequests: '',
+  deliveryMethod: 'pickup',
+  deliveryAddress: '',
 };
 
 const initialPricing: OrderFormState['pricing'] = {
@@ -70,13 +80,23 @@ const initialPricing: OrderFormState['pricing'] = {
   subtotal: 0,
   tax: 0,
   total: 0,
+  deliveryFee: 0,
+  deliveryEta: '',
+  grandTotal: 0,
 };
 
-const recalculate = (basePrice: number, fillingPrice: number, toppersPrice: number) => {
+const recalculate = (
+  basePrice: number,
+  fillingPrice: number,
+  toppersPrice: number,
+  deliveryFee: number = 0,
+  deliveryEta: string = ''
+) => {
   const subtotal = Number((basePrice + fillingPrice + toppersPrice).toFixed(2));
   const tax = Number((subtotal * VAT_RATE).toFixed(2));
   const total = Number((subtotal + tax).toFixed(2));
-  return { basePrice, fillingPrice, toppersPrice, subtotal, tax, total };
+  const grandTotal = Number((total + deliveryFee).toFixed(2));
+  return { basePrice, fillingPrice, toppersPrice, subtotal, tax, total, deliveryFee, deliveryEta, grandTotal };
 };
 
 export const useOrderFormStore = create<OrderFormState>()(
@@ -109,7 +129,13 @@ export const useOrderFormStore = create<OrderFormState>()(
       setSize: (sizeId: string, basePrice: number) => {
         set((state) => ({
           formData: { ...state.formData, sizeId },
-          pricing: recalculate(basePrice, state.pricing.fillingPrice, state.pricing.toppersPrice),
+          pricing: recalculate(
+            basePrice,
+            state.pricing.fillingPrice,
+            state.pricing.toppersPrice,
+            state.pricing.deliveryFee,
+            state.pricing.deliveryEta
+          ),
         }));
       },
 
@@ -122,7 +148,13 @@ export const useOrderFormStore = create<OrderFormState>()(
       setFilling: (fillingId: string, price: number) => {
         set((state) => ({
           formData: { ...state.formData, fillingId },
-          pricing: recalculate(state.pricing.basePrice, price, state.pricing.toppersPrice),
+          pricing: recalculate(
+            state.pricing.basePrice,
+            price,
+            state.pricing.toppersPrice,
+            state.pricing.deliveryFee,
+            state.pricing.deliveryEta
+          ),
         }));
       },
 
@@ -133,7 +165,13 @@ export const useOrderFormStore = create<OrderFormState>()(
 
           return {
             formData: { ...state.formData, topperIds: newTopperIds },
-            pricing: recalculate(state.pricing.basePrice, state.pricing.fillingPrice, newToppersPrice),
+            pricing: recalculate(
+              state.pricing.basePrice,
+              state.pricing.fillingPrice,
+              newToppersPrice,
+              state.pricing.deliveryFee,
+              state.pricing.deliveryEta
+            ),
           };
         });
       },
@@ -145,9 +183,50 @@ export const useOrderFormStore = create<OrderFormState>()(
 
           return {
             formData: { ...state.formData, topperIds: newTopperIds },
-            pricing: recalculate(state.pricing.basePrice, state.pricing.fillingPrice, newToppersPrice),
+            pricing: recalculate(
+              state.pricing.basePrice,
+              state.pricing.fillingPrice,
+              newToppersPrice,
+              state.pricing.deliveryFee,
+              state.pricing.deliveryEta
+            ),
           };
         });
+      },
+
+      setDeliveryMethod: (method: 'pickup' | 'delivery') => {
+        set((state) => ({
+          formData: { ...state.formData, deliveryMethod: method, ...(method === 'pickup' && { deliveryAddress: '' }) },
+          pricing:
+            method === 'pickup'
+              ? recalculate(state.pricing.basePrice, state.pricing.fillingPrice, state.pricing.toppersPrice, 0, '')
+              : state.pricing,
+        }));
+      },
+
+      setDeliveryQuote: (address: string, feeRands: number, eta: string) => {
+        set((state) => ({
+          formData: { ...state.formData, deliveryAddress: address },
+          pricing: recalculate(
+            state.pricing.basePrice,
+            state.pricing.fillingPrice,
+            state.pricing.toppersPrice,
+            feeRands,
+            eta
+          ),
+        }));
+      },
+
+      clearDeliveryQuote: () => {
+        set((state) => ({
+          pricing: recalculate(
+            state.pricing.basePrice,
+            state.pricing.fillingPrice,
+            state.pricing.toppersPrice,
+            0,
+            ''
+          ),
+        }));
       },
 
       setSubmittedOrder: (order) => {

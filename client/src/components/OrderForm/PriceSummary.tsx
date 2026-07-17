@@ -49,16 +49,25 @@ const PriceSummary: React.FC = () => {
           <span>VAT (15%)</span>
           <span>{formatPrice(pricing.tax)}</span>
         </div>
+        {formData.deliveryMethod === 'delivery' && pricing.deliveryFee > 0 && (
+          <div className="flex justify-between">
+            <span>Delivery</span>
+            <span>{formatPrice(pricing.deliveryFee)}</span>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between text-lg font-bold mb-2">
         <span>Total</span>
-        <span className="text-pink">{formatPrice(pricing.total)}</span>
+        <span className="text-pink">{formatPrice(pricing.grandTotal)}</span>
       </div>
 
       {formData.pickupDate && (
         <div className="bg-pink-light p-3 rounded-xl mt-4 text-sm">
-          <p className="font-medium">Pickup: {formData.pickupDate} at {formData.pickupTime}</p>
+          <p className="font-medium">
+            {formData.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}: {formData.pickupDate} at{' '}
+            {formData.pickupTime}
+          </p>
           <p className="text-gray-600">Payment due 7 days prior</p>
         </div>
       )}

@@ -33,6 +33,11 @@ export interface Order {
   allergiesRestrictions?: string;
   specialRequests?: string;
   customizations: OrderCustomization[];
+  deliveryMethod: 'pickup' | 'delivery';
+  deliveryAddress?: string;
+  deliveryFee: number;
+  deliveryStatus?: string;
+  uberTrackingUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -98,6 +103,17 @@ export interface CreateOrderRequest {
   specialRequests?: string;
   email: string;
   phone: string;
+  deliveryMethod?: 'pickup' | 'delivery';
+  deliveryAddress?: string;
+  deliveryFee?: number;
+}
+
+// Delivery
+export interface DeliveryQuote {
+  quoteId: string;
+  feeRands: number;
+  dropoffEta: string;
+  expiresAt: string;
 }
 
 // Auth

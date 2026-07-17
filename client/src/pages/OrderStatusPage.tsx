@@ -139,7 +139,7 @@ const OrderStatusPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               <div className="bg-pink-light rounded-xl p-4 text-center">
-                <p className="text-gray-500">Pickup</p>
+                <p className="text-gray-500">{order.deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup'}</p>
                 <p className="font-bold">{formatDate(order.pickupDate)}</p>
                 <p className="text-gray-600">at {order.pickupTime}</p>
               </div>
@@ -153,6 +153,28 @@ const OrderStatusPage: React.FC = () => {
                 <p className="font-bold">{formatDate(order.paymentDueDate)}</p>
               </div>
             </div>
+
+            {order.deliveryMethod === 'delivery' && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-xl text-sm">
+                <p className="text-gray-500 mb-1">Delivering to</p>
+                <p className="font-medium">{order.deliveryAddress}</p>
+                {order.deliveryStatus && (
+                  <p className="text-gray-600 mt-2">
+                    Courier status: <span className="font-medium">{order.deliveryStatus.replace(/_/g, ' ')}</span>
+                  </p>
+                )}
+                {order.uberTrackingUrl && (
+                  <a
+                    href={order.uberTrackingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-pink hover:underline font-medium mt-2 inline-block"
+                  >
+                    Track your delivery →
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         )}
 
