@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /payment/
 
-Sitemap: https://malikas-cakes.netlify.app/sitemap.xml
+Sitemap: https://malikascakeboutique.co.za/sitemap.xml
