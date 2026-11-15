@@ -6,12 +6,8 @@ export const contact = {
   instagramUrl: 'https://www.instagram.com/malikascakeboutique/',
   email: 'orders@malikacakes.co.za',
   location: 'Midrand, Johannesburg',
-  /**
-   * WhatsApp number in international format without "+" or spaces, e.g. "27712345678".
-   * Left empty until the real number is confirmed. While empty, the secondary CTA
-   * points to Instagram instead, so customers are never sent to a wrong number.
-   */
-  whatsappNumber: '',
+  /** WhatsApp number in international format without "+" or spaces (066 290 9593). */
+  whatsappNumber: '27662909593',
 };
 
 /** Malika's own accounts (all the same handle). Shown in the footer and the mobile menu. */
