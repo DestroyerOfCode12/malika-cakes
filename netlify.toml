@@ -3,6 +3,13 @@
   command = "npm run build"
   publish = "dist"
 
+# The old netlify.app address sends visitors (and Google) to the real domain.
+[[redirects]]
+  from = "https://malikas-cakes.netlify.app/*"
+  to = "https://malikascakeboutique.co.za/:splat"
+  status = 301
+  force = true
+
 # React Router uses client-side routing — without this, refreshing on
 # /order, /admin, etc. 404s because Netlify looks for a matching file.
 [[redirects]]
