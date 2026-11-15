@@ -18,7 +18,9 @@ export function Footer() {
           <p className="mt-4 text-sm leading-relaxed">
             {contact.location}
             <br />
-            Pickup 08:00–17:00
+            Mon–Fri 09:00–17:00
+            <br />
+            Sat 09:00–13:00 · Sun closed
             <br />
             <span className="text-white/50">Exact address sent with your order</span>
           </p>
