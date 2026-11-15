@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { CatalogSize, CatalogFlavor, CatalogFilling, CatalogTopper } from '../types';
 import { catalogService } from '../services/catalogService';
+import { previewSizes, previewFlavors, previewFillings, previewToppers } from '../data/previewCatalog';
 
 interface CatalogStore {
   sizes: CatalogSize[];
@@ -9,6 +10,8 @@ interface CatalogStore {
   toppers: CatalogTopper[];
   loading: boolean;
   error: string | null;
+  /** True when the API was unreachable and the built-in preview menu is shown instead. */
+  previewMode: boolean;
 
   fetchCatalog: () => Promise<void>;
   getSizeById: (id: string) => CatalogSize | undefined;
@@ -24,6 +27,7 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
   toppers: [],
   loading: false,
   error: null,
+  previewMode: false,
 
   fetchCatalog: async () => {
     const state = get();
@@ -49,6 +53,22 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
         loading: false,
       });
     } catch (error) {
+      // No HTTP response at all means the backend isn't reachable (not deployed
+      // yet, or offline). Show the preview menu so the form can still be browsed;
+      // ordering stays blocked until the API is live. A real server error still
+      // surfaces as an error.
+      const unreachable = !!error && typeof error === 'object' && 'isAxiosError' in error && !(error as { response?: unknown }).response;
+      if (unreachable) {
+        set({
+          sizes: previewSizes,
+          flavors: previewFlavors,
+          fillings: previewFillings,
+          toppers: previewToppers,
+          previewMode: true,
+          loading: false,
+        });
+        return;
+      }
       set({
         error: error instanceof Error ? error.message : 'Failed to load catalog',
         loading: false,

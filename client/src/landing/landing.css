@@ -1,0 +1,320 @@
+/* Landing page only. Loaded with the lazy landing chunk, so /order never ships it. */
+
+:root {
+  /* chrome heights on phones/tablets (Konsta navbar + tabbar), used for hero spacing */
+  --l-nav-h: 52px;
+  --l-tab-h: calc(58px + env(safe-area-inset-bottom));
+}
+
+/* ---------------------------------------------------------------- Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* page-level guard against accidental horizontal scroll from cropped decor */
+.landing {
+  overflow-x: clip;
+}
+
+/* ---------------------------------------------------------------- independent assets */
+.l-asset {
+  position: absolute;
+  pointer-events: none;
+  z-index: var(--z, 1);
+  display: var(--m-display, block);
+  top: var(--m-top, auto);
+  right: var(--m-right, auto);
+  bottom: var(--m-bottom, auto);
+  left: var(--m-left, auto);
+  width: var(--m-width);
+  will-change: transform;
+}
+@media (min-width: 768px) {
+  .l-asset {
+    display: var(--t-display, block);
+    top: var(--t-top, auto);
+    right: var(--t-right, auto);
+    bottom: var(--t-bottom, auto);
+    left: var(--t-left, auto);
+    width: var(--t-width);
+  }
+}
+@media (min-width: 1024px) {
+  .l-asset {
+    display: var(--d-display, block);
+    top: var(--d-top, auto);
+    right: var(--d-right, auto);
+    bottom: var(--d-bottom, auto);
+    left: var(--d-left, auto);
+    width: var(--d-width);
+  }
+}
+.l-asset__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- hero grid
+   Mobile priority: headline → cake → copy → CTA.
+   Desktop: copy column on the left, the cake overlapping the headline from the right. */
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'eyebrow'
+    'title'
+    'cake'
+    'copy'
+    'cta';
+  align-content: center;
+  row-gap: 0.75rem;
+  padding-top: calc(var(--l-nav-h) + 0.75rem);
+  padding-bottom: calc(var(--l-tab-h) + 0.75rem);
+}
+.hero-area-eyebrow { grid-area: eyebrow; }
+.hero-area-title { grid-area: title; }
+.hero-area-cake {
+  grid-area: cake;
+  justify-self: center;
+  /* the cake gets whatever height is left after the bars and ~370px of text/CTA,
+     so the CTA never slips under the tab bar */
+  width: min(84vw, max(190px, calc(100svh - var(--l-nav-h) - var(--l-tab-h) - 360px)), 420px);
+  margin: -0.5rem 0;
+}
+.hero-area-copy { grid-area: copy; }
+.hero-area-cta { grid-area: cta; margin-top: 0.5rem; }
+
+@media (min-width: 768px) {
+  .hero-area-cake {
+    width: min(62vw, max(260px, calc(100svh - var(--l-nav-h) - var(--l-tab-h) - 440px)), 560px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      'eyebrow cake'
+      'title cake'
+      'copy cake'
+      'cta cake';
+    column-gap: 0;
+    row-gap: 1.25rem;
+    padding-top: 6rem;
+    padding-bottom: 3rem;
+  }
+  .hero-area-cake {
+    align-self: center;
+    justify-self: end;
+    width: min(54vw, 84svh, 900px);
+    /* overlap the headline's right edge for depth */
+    margin: 0 -3vw 0 -14vw;
+  }
+  .hero-area-title { position: relative; z-index: 6; }
+  .hero-area-copy { margin-top: 0.5rem; }
+}
+
+/* scroll hint line */
+.hero-scroll-line {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(63, 63, 70, 0.2);
+}
+.hero-scroll-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #db2777;
+  transform: translateX(-100%);
+  animation: l-scroll-hint 2.2s ease-in-out infinite;
+}
+@keyframes l-scroll-hint {
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+/* ---------------------------------------------------------------- build your cake
+   Pinned story only on desktop with motion allowed; otherwise the stacked layout. */
+.build-pinned { display: none; }
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .build-pinned { display: block; }
+  .build-stacked { display: none; }
+}
+
+.build-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3f3f46;
+  box-shadow: 0 6px 18px -8px rgba(219, 39, 119, 0.35);
+}
+.build-note-line {
+  display: inline-block;
+  width: 36px;
+  height: 1px;
+  background: #db2777;
+}
+
+/* ---------------------------------------------------------------- header */
+.landing-header {
+  transition: background-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease;
+}
+.landing-header.is-scrolled {
+  background-color: rgba(255, 248, 250, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 rgba(63, 63, 70, 0.08);
+}
+
+/* ---------------------------------------------------------------- buttons & links
+   White on #DB2777 is ~4.3:1, so primary buttons use 19px bold (WCAG "large text"). */
+.l-btn-primary,
+.l-btn-outline,
+.l-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 0.85rem 1.9rem;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease, box-shadow 0.25s ease,
+    color 0.25s ease, border-color 0.25s ease;
+}
+.l-btn-primary {
+  background: #db2777;
+  color: #fff;
+  box-shadow: 0 10px 24px -10px rgba(219, 39, 119, 0.6);
+}
+.l-btn-primary:hover {
+  background: #c21f69;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -12px rgba(219, 39, 119, 0.7);
+}
+.l-btn-outline {
+  border: 2px solid #3f3f46;
+  color: #3f3f46;
+}
+.l-btn-outline:hover {
+  background: #3f3f46;
+  color: #fff;
+}
+.l-btn-ghost {
+  border: 2px solid rgba(247, 200, 211, 0.6);
+  color: #fff;
+}
+.l-btn-ghost:hover {
+  border-color: #f7c8d3;
+  background: rgba(247, 200, 211, 0.1);
+}
+.l-btn-sm {
+  min-height: 44px;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+}
+.l-btn-primary:active,
+.l-btn-outline:active,
+.l-btn-ghost:active {
+  transform: scale(0.97);
+}
+
+.l-link {
+  position: relative;
+}
+.l-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.l-link:hover::after,
+.l-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.l-footer-link {
+  transition: color 0.2s ease;
+}
+.l-footer-link:hover {
+  color: #f7c8d3;
+}
+
+/* visible, consistent focus ring on the landing page (2px rose outline + offset) */
+.landing a:focus-visible,
+.landing button:focus-visible,
+.landing-header a:focus-visible,
+.landing-footer a:focus-visible,
+.l-skip-link:focus-visible {
+  outline: 2px solid #db2777;
+  outline-offset: 3px;
+  box-shadow: none;
+  border-radius: 6px;
+}
+#order-cta a:focus-visible,
+.landing-footer a:focus-visible {
+  outline-color: #f7c8d3;
+}
+
+.l-skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 999px;
+  background: #3f3f46;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+.l-skip-link:focus {
+  transform: translateY(0);
+}
+
+/* mobile/tablet: leave room for the Konsta tab bar */
+@media (max-width: 1023.98px) {
+  .landing-footer {
+    padding-bottom: var(--l-tab-h);
+  }
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-line::after {
+    animation: none;
+  }
+  .l-asset {
+    will-change: auto;
+  }
+}

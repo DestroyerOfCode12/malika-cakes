@@ -1,5 +1,16 @@
+import konstaConfig from 'konsta/config';
+
+// Konsta UI (v3, the Tailwind v3 line) only adds to the theme: a `primary` colour,
+// `ios:` / `material:` variants and a few spacing steps. Everything below is the
+// existing brand config, unchanged, so the order form and admin keep their styling.
 /** @type {import('tailwindcss').Config} */
-export default {
+export default konstaConfig({
+  konsta: {
+    // Native mobile chrome uses the logo's rose pink instead of Konsta's default iOS blue
+    colors: {
+      primary: '#DB2777',
+    },
+  },
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -18,6 +29,7 @@ export default {
       fontFamily: {
         script: ['"Kaushan Script"', 'cursive'],
         sans: ['Poppins', 'Inter', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       keyframes: {
         wiggle: {
@@ -37,4 +49,4 @@ export default {
     },
   },
   plugins: [],
-}
+});

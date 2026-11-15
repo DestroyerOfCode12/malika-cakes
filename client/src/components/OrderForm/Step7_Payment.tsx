@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useOrderFormStore } from '../../store/orderFormStore';
 import { orderService } from '../../services/orderService';
+import { useCatalogStore } from '../../store/catalogStore';
 import { formatPrice, formatDate } from '../../utils/formatters';
 import { calculatePaymentDueDate } from '../../utils/validators';
 
 const Step7_Payment: React.FC = () => {
   const { formData, pricing, setSubmittedOrder, setError, error } = useOrderFormStore();
   const [submitting, setSubmitting] = useState(false);
+  const previewMode = useCatalogStore((s) => s.previewMode);
 
   const paymentDueDate = formData.pickupDate ? calculatePaymentDueDate(formData.pickupDate) : null;
 
@@ -80,6 +82,13 @@ const Step7_Payment: React.FC = () => {
         </p>
       </div>
 
+      {previewMode && (
+        <div role="status" className="p-4 rounded-lg text-sm mb-4 bg-amber-50 border border-amber-200 text-amber-900">
+          <p className="font-medium mb-1">Preview mode: online ordering isn't live yet</p>
+          <p>You're seeing the menu and prices as they'll appear. Orders can't be placed until the ordering system is switched on.</p>
+        </div>
+      )}
+
       {error && (
         <div role="alert" aria-live="assertive" className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4">
           {error}
@@ -89,10 +98,10 @@ const Step7_Payment: React.FC = () => {
       <button
         type="button"
         onClick={handleConfirmOrder}
-        disabled={submitting}
+        disabled={submitting || previewMode}
         className="btn-primary w-full"
       >
-        {submitting ? 'Submitting Order...' : 'Confirm Order'}
+        {previewMode ? 'Ordering opens soon' : submitting ? 'Submitting Order...' : 'Confirm Order'}
       </button>
     </div>
   );
