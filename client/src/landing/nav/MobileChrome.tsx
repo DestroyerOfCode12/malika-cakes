@@ -5,7 +5,7 @@ import { LogoMark } from '../../components/Logo';
 import { ScrollTrigger, useGSAP } from '../lib/gsap';
 import { useSmoothScroll } from '../lib/SmoothScroll';
 import { detectNativeTheme } from '../lib/platform';
-import { contact } from '../config/content';
+import { contact, socials } from '../config/content';
 import { navItems } from './navItems';
 
 const Icon = {
@@ -130,7 +130,9 @@ export function MobileChrome() {
                 onClick={() => (item.kind === 'section' ? go(item.target) : navigate(item.to))}
               />
             ))}
-            <ListItem link title={`Instagram @${contact.instagramHandle}`} href={contact.instagramUrl} target="_blank" rel="noopener noreferrer" />
+            {socials.map((s) => (
+              <ListItem key={s.label} link title={`${s.label} @${contact.instagramHandle}`} href={s.url} target="_blank" rel="noopener noreferrer" />
+            ))}
           </List>
           <div className="px-4 pb-6">
             <button type="button" onClick={() => navigate('/order')} className="l-btn-primary w-full">

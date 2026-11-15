@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import Logo from '../../components/Logo';
-import { contact } from '../config/content';
+import { contact, socials } from '../config/content';
 
 export function Footer() {
   return (
@@ -32,11 +32,13 @@ export function Footer() {
                 {contact.email}
               </a>
             </li>
-            <li>
-              <a className="l-footer-link" href={contact.instagramUrl} target="_blank" rel="noopener noreferrer">
-                @{contact.instagramHandle}
-              </a>
-            </li>
+            {socials.map((s) => (
+              <li key={s.label}>
+                <a className="l-footer-link" href={s.url} target="_blank" rel="noopener noreferrer">
+                  {s.label} @{contact.instagramHandle}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 

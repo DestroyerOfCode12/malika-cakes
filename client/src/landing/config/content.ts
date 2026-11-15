@@ -2,8 +2,8 @@
 // site) never has to dig through layout code to change a price or a sentence.
 
 export const contact = {
-  instagramHandle: 'malikascakes',
-  instagramUrl: 'https://www.instagram.com/malikascakes/',
+  instagramHandle: 'malikascakeboutique',
+  instagramUrl: 'https://www.instagram.com/malikascakeboutique/',
   email: 'orders@malikacakes.co.za',
   location: 'Midrand, Johannesburg',
   /**
@@ -13,6 +13,13 @@ export const contact = {
    */
   whatsappNumber: '',
 };
+
+/** Malika's own accounts (all the same handle). Shown in the footer and the mobile menu. */
+export const socials = [
+  { label: 'Instagram', url: 'https://www.instagram.com/malikascakeboutique/' },
+  { label: 'TikTok', url: 'https://www.tiktok.com/@malikascakeboutique' },
+  { label: 'Facebook', url: 'https://www.facebook.com/malikascakeboutique/' },
+];
 
 export const whatsappUrl = contact.whatsappNumber
   ? `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent("Hi Malika! I'd like to ask about a cake.")}`
