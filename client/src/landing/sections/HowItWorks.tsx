@@ -3,7 +3,7 @@ import { gsap, useGSAP } from '../lib/gsap';
 import { howItWorks } from '../config/content';
 import { duration, ease, media } from '../config/motion';
 
-const badges = ['Secure checkout with PayFast', 'Delivery with Uber available', 'Order 14 days ahead'];
+const badges = ['Card, EFT, Apple Pay & Google Pay', 'Delivery with Uber available', 'Order 14 days ahead'];
 
 export function HowItWorks() {
   const root = useRef<HTMLElement>(null);

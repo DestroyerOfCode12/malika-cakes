@@ -60,7 +60,15 @@ interface BuildPaymentFieldsParams {
   returnUrl: string;
   cancelUrl: string;
   notifyUrl: string;
+  /** PayFast payment_method code; when set, the customer goes straight to that one method. */
+  paymentMethod?: PayfastMethod;
 }
+
+/** Codes from PayFast's custom integration docs: Apple Pay, Google Pay, card, instant EFT. */
+export const PAYFAST_METHODS = ['ap', 'gp', 'cc', 'ef'] as const;
+export type PayfastMethod = (typeof PAYFAST_METHODS)[number];
+export const isPayfastMethod = (v: unknown): v is PayfastMethod =>
+  typeof v === 'string' && (PAYFAST_METHODS as readonly string[]).includes(v);
 
 /**
  * Builds the signed field set for a PayFast "Pay Now" form submission.
@@ -83,6 +91,8 @@ export const buildPayfastPaymentFields = (params: BuildPaymentFieldsParams) => {
     amount: params.amount.toFixed(2),
     item_name: params.itemName,
   };
+  // payment_method comes after the transaction fields in PayFast's signing order
+  if (params.paymentMethod) fields.payment_method = params.paymentMethod;
 
   const signature = generateSignature(fields);
 

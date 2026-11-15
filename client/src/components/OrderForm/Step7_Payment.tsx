@@ -77,7 +77,7 @@ const Step7_Payment: React.FC = () => {
       <div className="p-4 border border-gray-200 rounded-lg text-sm text-gray-600 mb-6">
         <p className="font-medium mb-1">How payment works</p>
         <p>
-          Once you confirm, you'll get the option to pay securely online with PayFast, or arrange
+          Once you confirm, you'll get the option to pay securely online (card, EFT, Apple Pay or Google Pay), or arrange
           payment with us directly via WhatsApp or email before your deadline.
         </p>
       </div>

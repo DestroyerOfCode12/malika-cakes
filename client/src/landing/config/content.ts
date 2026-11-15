@@ -70,7 +70,7 @@ export const howItWorks = [
   {
     n: '01',
     title: 'Order online',
-    body: 'Design your cake at least 14 days ahead. Pay securely with PayFast. Payment is due 7 days before pickup.',
+    body: 'Design your cake at least 14 days ahead. Pay securely by card, EFT, Apple Pay or Google Pay. Payment is due 7 days before pickup.',
   },
   {
     n: '02',

@@ -11,7 +11,7 @@ import {
 import { calculateOrderPrice, calculateToppersPrice, parsePickupTime, formatPickupTime } from '../utils/pricing';
 import { emailService } from '../services/emailService';
 import { serializeOrder } from '../utils/serialize';
-import { buildPayfastPaymentFields, isPayfastConfigured } from '../services/paymentService';
+import { buildPayfastPaymentFields, isPayfastConfigured, isPayfastMethod } from '../services/paymentService';
 import { isUberDirectConfigured } from '../services/uberDirectService';
 
 const router = Router();
@@ -304,6 +304,7 @@ router.post('/:id/pay', async (req: Request, res: Response, next: NextFunction) 
       returnUrl: `${frontendUrl}/payment/success?order=${order.orderNumber}`,
       cancelUrl: `${frontendUrl}/payment/cancelled?order=${order.orderNumber}`,
       notifyUrl: `${backendUrl}/api/payments/payfast/notify`,
+      paymentMethod: isPayfastMethod(req.body?.method) ? req.body.method : undefined,
     });
 
     res.json({ data: payment });
