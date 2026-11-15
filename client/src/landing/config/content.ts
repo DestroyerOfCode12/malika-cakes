@@ -4,7 +4,7 @@
 export const contact = {
   instagramHandle: 'malikascakeboutique',
   instagramUrl: 'https://www.instagram.com/malikascakeboutique/',
-  email: 'orders@malikacakes.co.za',
+  email: 'malikascakeb@icloud.com',
   location: 'Midrand, Johannesburg',
   /** WhatsApp number in international format without "+" or spaces (066 290 9593). */
   whatsappNumber: '27662909593',
